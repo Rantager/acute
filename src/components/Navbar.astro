@@ -1,20 +1,16 @@
 ---
-// Navbar.astro - Barra de navegación moderna, responsiva y accesible
-// Incluye: Logo, enlaces con dropdown, menú hamburguesa móvil y CTA destacado
-
 interface Props {
-  logoText?: string;
   companyName?: string;
 }
 
-const { logoText = '[Logo Empresa]', companyName = 'Acute' } = Astro.props;
+const { companyName = 'Acute' } = Astro.props;
 ---
 
 <nav class="sticky top-0 z-50 border-b border-slate-800/50 bg-slate-950/95 backdrop-blur-md transition-all duration-300">
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
       
-      <!-- Logo / Brand -->
+      <!-- LOGO -->
       <div class="flex-shrink-0">
         <a href="/" class="flex items-center gap-2 group">
           <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center font-bold text-white text-sm group-hover:shadow-lg group-hover:shadow-blue-500/50 transition-all duration-300">
@@ -24,48 +20,36 @@ const { logoText = '[Logo Empresa]', companyName = 'Acute' } = Astro.props;
         </a>
       </div>
 
-      <!-- Desktop Navigation (hidden on mobile) -->
+      <!-- DESKTOP MENU -->
       <div class="hidden md:flex items-center gap-8">
-        
-        <!-- Navigation Links -->
         <div class="flex items-center gap-6">
-          <!-- SCROLL LINK: Apunta a #hero (Hero Section) -->
-          <a href="#hero" class="text-slate-300 hover:text-blue-400 transition-colors duration-300 text-sm font-medium relative group">
+          <a href="/" class="text-slate-300 hover:text-blue-400 transition-colors duration-300 text-sm font-medium relative group">
             Inicio
             <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 group-hover:w-full transition-all duration-300"></span>
           </a>
 
-          <!-- Dropdown: Servicios -->
-          <!-- SCROLL LINK: Apunta a #servicios (Services Section) -->
-          <div class="relative group">
-            <a href="#servicios" class="text-slate-300 hover:text-blue-400 transition-colors duration-300 text-sm font-medium flex items-center gap-1 relative group/btn">
-              Servicios
-              <svg class="w-4 h-4 group-hover/btn:text-blue-400 transition-transform duration-300 group-hover/btn:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-              </svg>
-            </a>
-          </div>
+          <a href="/servicios" class="text-slate-300 hover:text-blue-400 transition-colors duration-300 text-sm font-medium relative group">
+            Servicios
+            <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 group-hover:w-full transition-all duration-300"></span>
+          </a>
 
-          <!-- SCROLL LINK: Apunta a #portfolio (Portfolio Section) -->
-          <a href="#portfolio" class="text-slate-300 hover:text-blue-400 transition-colors duration-300 text-sm font-medium relative group">
+          <a href="/proyectos" class="text-slate-300 hover:text-blue-400 transition-colors duration-300 text-sm font-medium relative group">
             Proyectos
             <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 group-hover:w-full transition-all duration-300"></span>
           </a>
 
-          <!-- SCROLL LINK: Apunta a #about (Metodología / About Section) -->
-          <a href="#about" class="text-slate-300 hover:text-blue-400 transition-colors duration-300 text-sm font-medium relative group">
+          <a href="/metodologia" class="text-slate-300 hover:text-blue-400 transition-colors duration-300 text-sm font-medium relative group">
             Metodología
             <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 group-hover:w-full transition-all duration-300"></span>
           </a>
         </div>
 
-        <!-- CTA Button -->
-        <a href="#contacto" class="ml-4 px-6 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-medium text-sm hover:shadow-lg hover:shadow-blue-500/50 transform hover:scale-105 transition-all duration-300 whitespace-nowrap">
+        <a href="/cotizar" class="ml-4 px-6 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-medium text-sm hover:shadow-lg hover:shadow-blue-500/50 transform hover:scale-105 transition-all duration-300 whitespace-nowrap">
           Cotizar Proyecto
         </a>
       </div>
 
-      <!-- Mobile Menu Button (visible only on mobile) -->
+      <!-- BOTÓN MÓVIL (Hamburguesa) -->
       <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg text-slate-300 hover:bg-slate-800 transition-colors duration-300" aria-label="Abrir menú">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -73,31 +57,14 @@ const { logoText = '[Logo Empresa]', companyName = 'Acute' } = Astro.props;
       </button>
     </div>
 
-    <!-- Mobile Menu (hidden by default, shown when button clicked) -->
+    <!-- MENÚ MÓVIL DESPLEGABLE -->
     <div id="mobile-menu" class="hidden md:hidden pb-4 border-t border-slate-800/50">
       <div class="space-y-2 pt-4">
-        <!-- SCROLL LINK: Mobile Inicio -->
-        <a href="#hero" class="block px-4 py-2.5 text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 rounded-lg transition-all duration-300 font-medium text-sm">
-          Inicio
-        </a>
-        
-        <!-- SCROLL LINK: Mobile Servicios -->
-        <a href="#servicios" class="block px-4 py-2.5 text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 rounded-lg transition-all duration-300 font-medium text-sm">
-          Servicios
-        </a>
-
-        <!-- SCROLL LINK: Mobile Proyectos -->
-        <a href="#portfolio" class="block px-4 py-2.5 text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 rounded-lg transition-all duration-300 font-medium text-sm">
-          Proyectos
-        </a>
-
-        <!-- SCROLL LINK: Mobile Metodología -->
-        <a href="#about" class="block px-4 py-2.5 text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 rounded-lg transition-all duration-300 font-medium text-sm">
-          Metodología
-        </a>
-
-        <!-- CTA Button (mobile) -->
-        <a href="#contacto" class="block px-4 py-2.5 mt-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-medium text-sm hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 text-center">
+        <a href="/" class="block px-4 py-2.5 text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 rounded-lg transition-all duration-300 font-medium text-sm">Inicio</a>
+        <a href="/servicios" class="block px-4 py-2.5 text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 rounded-lg transition-all duration-300 font-medium text-sm">Servicios</a>
+        <a href="/proyectos" class="block px-4 py-2.5 text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 rounded-lg transition-all duration-300 font-medium text-sm">Proyectos</a>
+        <a href="/metodologia" class="block px-4 py-2.5 text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 rounded-lg transition-all duration-300 font-medium text-sm">Metodología</a>
+        <a href="/cotizar" class="block px-4 py-2.5 mt-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-medium text-sm hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 text-center">
           Cotizar Proyecto
         </a>
       </div>
@@ -106,7 +73,6 @@ const { logoText = '[Logo Empresa]', companyName = 'Acute' } = Astro.props;
 </nav>
 
 <script>
-  // Mobile Menu Toggle
   const mobileMenuBtn = document.getElementById('mobile-menu-btn');
   const mobileMenu = document.getElementById('mobile-menu');
 
@@ -115,12 +81,4 @@ const { logoText = '[Logo Empresa]', companyName = 'Acute' } = Astro.props;
       mobileMenu?.classList.toggle('hidden');
     });
   }
-
-  // Close mobile menu when clicking on a link
-  const mobileLinks = mobileMenu?.querySelectorAll('a');
-  mobileLinks?.forEach(link => {
-    link.addEventListener('click', () => {
-      mobileMenu?.classList.add('hidden');
-    });
-  });
 </script>
