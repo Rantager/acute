@@ -1,0 +1,58 @@
+---
+---
+<section id="contact" class="mt-16 rounded-[2rem] border border-slate-800/70 bg-slate-950/80 p-8 shadow-soft sm:p-10">
+  <div class="grid gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-start">
+    <div>
+      <p class="text-sm uppercase tracking-[0.3em] text-brand-400">Contacto & Cotización</p>
+      <h2 class="mt-4 text-3xl font-semibold text-white sm:text-4xl">Háblanos de tu idea</h2>
+      <p class="mt-5 text-slate-300 leading-8">
+        Completa los datos y selecciona el tipo de software que necesitas. Este módulo está preparado para hidratarse como isla interactiva con <code>client:load</code>.
+      </p>
+    </div>
+    <form id="quoteForm" class="space-y-6 rounded-3xl bg-slate-900/90 p-6 shadow-xl">
+      <label class="block text-sm font-medium text-slate-200">
+        Nombre
+        <input name="name" type="text" required class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-slate-100 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20" placeholder="Tu nombre" />
+      </label>
+      <label class="block text-sm font-medium text-slate-200">
+        Correo electrónico
+        <input name="email" type="email" required class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-slate-100 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20" placeholder="ejemplo@empresa.com" />
+      </label>
+      <label class="block text-sm font-medium text-slate-200">
+        Tipo de software
+        <select name="softwareType" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-slate-100 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20">
+          <option value="web">Aplicación web</option>
+          <option value="mobile">Aplicación móvil</option>
+          <option value="saas">Plataforma SaaS</option>
+          <option value="api">API / Microservicios</option>
+        </select>
+      </label>
+      <label class="block text-sm font-medium text-slate-200">
+        Mensaje breve
+        <textarea name="message" rows="4" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-slate-100 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20" placeholder="Describe tu proyecto, objetivos y plazos"></textarea>
+      </label>
+
+      <button type="submit" class="inline-flex w-full items-center justify-center rounded-full bg-brand-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500/60">
+        Enviar solicitud
+      </button>
+
+      <div id="formStatus" class="min-h-[1.5rem] text-sm text-slate-300"></div>
+    </form>
+  </div>
+
+  <script type="module">
+    const form = document.querySelector('#quoteForm');
+    const status = document.querySelector('#formStatus');
+
+    form?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const data = new FormData(form);
+      const payload = Object.fromEntries(data.entries());
+      status.textContent = 'Preparando tu cotización...';
+
+      window.setTimeout(() => {
+        status.textContent = `Gracias, ${payload.name}. Recibimos tu solicitud para ${payload.softwareType} y te contactaremos pronto.`;
+      }, 650);
+    });
+  </script>
+</section>

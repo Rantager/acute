@@ -1,0 +1,40 @@
+---
+const { title, description, image } = Astro.props;
+const siteUrl = 'https://www.acute.dev';
+const pageTitle = title ? `${title} | Acute` : 'Acute | Desarrollo de software a medida';
+const pageDescription = description ?? 'Acute diseña aplicaciones web y sistemas escalables con enfoque en rendimiento, calidad y experiencia de usuario.';
+const pageImage = image ?? `${siteUrl}/og-image.png`;
+import '../styles/global.css';
+---
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0f172a" />
+    <meta name="description" content={pageDescription} />
+    <meta name="robots" content="index, follow" />
+
+    <title>{pageTitle}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
+
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:image" content={pageImage} />
+    <meta property="og:url" content={siteUrl} />
+    <meta property="og:site_name" content="Acute" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    <meta name="twitter:image" content={pageImage} />
+  </head>
+  <body class="min-h-screen bg-slate-950 text-slate-100 antialiased">
+    <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <slot />
+    </div>
+  </body>
+</html>
