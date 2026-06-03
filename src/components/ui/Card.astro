@@ -1,12 +1,47 @@
 ---
 const { title, description, tags = [] } = Astro.props;
+
+// Mapeo de tecnologías a iconos SVG simples
+const getTechIcon = (tech: string) => {
+  const techIcons: Record<string, string> = {
+    'Node.js': '🟢',
+    'React': '⚛️',
+    'Vue': '💚',
+    'Astro': '🚀',
+    'PostgreSQL': '🐘',
+    'AWS': '☁️',
+    'GraphQL': '🔷',
+    'Microservicios': '🔗',
+    'TypeScript': '🔵',
+    'Docker': '🐳',
+    'Payment API': '💳',
+    'Tailwind': '🎨',
+    'Swift': '🍎',
+    'Kotlin': '🟣',
+    'React Native': '⚛️',
+    'Flutter': '🦋',
+  };
+  
+  return techIcons[tech] || '⚙️';
+};
 ---
+
 <article class="rounded-3xl border border-slate-800/70 bg-slate-900/80 p-6 shadow-soft">
   <h3 class="text-xl font-semibold text-white">{title}</h3>
   <p class="mt-3 text-slate-300 leading-7">{description}</p>
-  <div class="mt-5 flex flex-wrap gap-2 text-sm text-slate-400">
-    {tags.map((tag) => (
-      <span class="rounded-full border border-slate-700 px-3 py-1">{tag}</span>
-    ))}
-  </div>
+  
+  <!-- Contenedor de Tecnologías (Tags con iconos) -->
+  {tags.length > 0 && (
+    <div class="mt-5 flex flex-wrap gap-2">
+      {tags.map((tag) => (
+        <div class="inline-flex items-center gap-1.5 rounded-full border border-slate-700 bg-slate-800/40 px-3 py-1.5 text-sm text-slate-300 hover:border-brand-500/50 hover:bg-slate-800/60 transition-all duration-300">
+          <!-- TODO: Reemplazar emoji con logo/imagen real de la tecnología -->
+          <span class="text-base" aria-label={`Logo ${tag}`}>
+            {getTechIcon(tag)}
+          </span>
+          <span class="font-medium">{tag}</span>
+        </div>
+      ))}
+    </div>
+  )}
 </article>

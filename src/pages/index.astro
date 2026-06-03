@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Hero from '../components/home/Hero.astro';
+import Services from '../components/home/Services.astro';
 import About from '../components/home/About.astro';
 import Portfolio from '../components/home/Portfolio.astro';
 import ContactQuote from '../components/contact/ContactQuote.astro';
@@ -11,9 +12,19 @@ import ContactQuote from '../components/contact/ContactQuote.astro';
   image="https://www.acute.dev/og-image.png"
 >
   <main class="space-y-16">
+    <!-- #hero -->
     <Hero />
+    
+    <!-- #servicios -->
+    <Services />
+    
+    <!-- #about (Metodología) -->
     <About />
+    
+    <!-- #portfolio (Proyectos) -->
     <Portfolio />
+    
+    <!-- #contact (Contacto) -->
     <ContactQuote client:load />
   </main>
 </Layout>

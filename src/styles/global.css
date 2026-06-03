@@ -34,3 +34,9 @@ body {
   white-space: nowrap;
   border: 0;
 }
+
+/* Scroll Margin para evitar que la navbar sticky tape los títulos */
+/* Se aplica a todos los elementos con id que son targets de scroll */
+[id] {
+  scroll-margin-top: 6rem; /* 64px + padding adicional para la navbar sticky */
+}
