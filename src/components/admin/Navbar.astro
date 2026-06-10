@@ -1,0 +1,28 @@
+---
+// src/components/admin/Navbar.astro
+const { seccionActiva } = Astro.props;
+---
+<nav class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 backdrop-blur-md bg-opacity-80">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex items-center gap-8">
+        <div class="flex items-center gap-2">
+          <div class="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white text-lg tracking-wider">A</div>
+          <span class="font-bold text-xl text-white tracking-tight">Acute <span class="text-blue-500 text-xs font-mono">Control</span></span>
+        </div>
+        <div class="hidden md:flex space-x-1">
+          <a href="?tab=clientes" class={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${seccionActiva === 'clientes' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
+            Clientes
+          </a>
+          <a href="?tab=proyectos" class={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${seccionActiva === 'proyectos' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
+            Proyectos y Finanzas
+          </a>
+          <a href="?tab=cotizaciones" class={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${seccionActiva === 'cotizaciones' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
+            Gestionar Cotizaciones
+          </a>
+        </div>
+      </div>
+      <span class="bg-slate-800 text-slate-400 text-xs font-mono px-3 py-1 rounded-full border border-slate-700">Enterprise CRM</span>
+    </div>
+  </div>
+</nav>
