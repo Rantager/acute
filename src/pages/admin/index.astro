@@ -5,6 +5,7 @@ import Navbar from '../../components/admin/Navbar.astro';
 import Kpis from '../../components/admin/Kpis.astro';
 import TabClientes from '../../components/admin/TabClientes.astro';
 import TabProyectos from '../../components/admin/TabProyectos.astro';
+import TabCotizaciones from '../../components/admin/TabCotizaciones.astro';
 
 export const prerender = false; // Forzamos SSR
 
@@ -99,8 +100,9 @@ if (Astro.request.method === "POST") {
     mensajeFeedBack = `Error: ${err.message}`;
   }
 }
+
 // -------------------------------------------------------------------------
-// CONSULTAS Y PRE-CÁLCULOS DEL FRONTMATTER
+// CONSULTAS Y PRE-CÁLCULOS DEL FRONTMATTER (BLINDADO CONTRA EL PARSER)
 // -------------------------------------------------------------------------
 const { data: dbClientes } = await supabase.from('clientes').select('*').order('id', { ascending: true });
 const listaClientes = dbClientes || [];
@@ -111,13 +113,22 @@ const dbProyectosValidos = dbProyectos || [];
 const proyectosConCalculo = dbProyectosValidos.map((p) => {
   const total = Number(p.costo_total) || 0;
   const abonado = Number(p.total_abonado) || 0;
-  const saldo = total - abonado;
+  const diff = total - abonado;
+  
+  // Math.max elimina el '<' para el saldo
+  const saldo = Math.max(0, diff); 
+  
+  // Math.sign devuelve -1 si es negativo, 0 si es cero, y 1 si es positivo.
+  // Si diff es 0 o negativo, significa que el saldo es menor o igual a cero (Liquidado).
+  // Con esto eliminamos completamente el carácter '<' de todo el bloque.
+  const esLiquidado = Math.sign(diff) !== 1; 
+
   return {
     ...p,
     total,
     abonado,
-    saldo: saldo < 0 ? 0 : saldo,
-    esLiquidado: saldo <= 0,
+    saldo,
+    esLiquidado,
     nombreEmpresa: p.clientes?.nombre_empresa || 'Cliente Desconocido',
     contactoNombre: p.clientes?.nombre_contacto || 'Sin contacto',
     contactoCorreo: p.clientes?.correo || 'Sin correo',
@@ -125,8 +136,15 @@ const proyectosConCalculo = dbProyectosValidos.map((p) => {
   };
 });
 
-const ingresosTotales = proyectosConCalculo.reduce((sum, p) => sum + p.total, 0);
-const dineroEnMano = proyectosConCalculo.reduce((sum, p) => sum + p.abonado, 0);
+// Reducción explícita aislada del renderizado HTML
+const ingresosTotales = proyectosConCalculo.reduce((sum, p) => {
+  return sum + p.total;
+}, 0);
+
+const dineroEnMano = proyectosConCalculo.reduce((sum, p) => {
+  return sum + p.abonado;
+}, 0);
+
 const cuentasPorCobrar = ingresosTotales - dineroEnMano;
 ---
 
@@ -161,17 +179,12 @@ const cuentasPorCobrar = ingresosTotales - dineroEnMano;
     )}
 
     {seccionActiva === "cotizaciones" && (
-      <section class="bg-slate-900/40 border border-slate-800 p-8 rounded-2xl shadow-xl text-center max-w-3xl mx-auto space-y-4">
-        <div class="h-12 w-12 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center mx-auto">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-        </div>
-        <h2 class="text-xl font-bold text-white">Buzón de Mensajes Automatizados</h2>
-        <p class="text-slate-400 text-sm max-w-md mx-auto">Fase posterior: Aquí capturaremos las llamadas de la API de WhatsApp y los correos enviados desde el cotizador público.</p>
-      </section>
+      <TabCotizaciones />
     )}
 
   </main>
 
+  {/* CONTENEDOR LATERAL (DRAWER) DE DETALLES DE PROYECTOS */}
   <div id="backdrop-panel" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300">
     <div id="drawer-panel" class="absolute right-0 top-0 bottom-0 w-full max-w-md sm:max-w-lg bg-slate-900 border-l border-slate-800 h-full p-6 sm:p-8 shadow-2xl flex flex-col justify-between transform translate-x-full transition-transform duration-300 ease-out overflow-y-auto">
       <div class="space-y-6">
@@ -225,7 +238,6 @@ const cuentasPorCobrar = ingresosTotales - dineroEnMano;
     const detNombre = document.getElementById('det-nombre');
     const detEmpresa = document.getElementById('det-empresa');
     const detEstatus = document.getElementById('det-estatus');
-    const det遊戯 = document.getElementById('det-descripcion'); // Asegurando mapeo limpio
     const detDescripcion = document.getElementById('det-descripcion');
     const detTecnologias = document.getElementById('det-tecnologias');
     const detInicio = document.getElementById('det-inicio');

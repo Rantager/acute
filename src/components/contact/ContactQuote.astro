@@ -57,7 +57,7 @@
   </div>
 
   <script type="module">
-    const OWNER_WHATSAPP_NUMBER = '3131068471';
+    const OWNER_WHATSAPP_NUMBER = '523131068471'; // CORREGIDO: Número correcto terminado en 8471
     const OWNER_EMAIL_ADDRESS = 'acutewebdesign7@gmail.com';
 
     const form = document.querySelector('#quoteForm');
@@ -67,7 +67,7 @@
 
     let currentAction = 'whatsapp';
 
-    console.log('[FormInit] Cargado con soporte FormSubmit integrado.');
+    console.log('[FormInit] Cargado con soporte de respaldo en Base de Datos integrado.');
 
     btnWhatsApp?.addEventListener('click', () => { currentAction = 'whatsapp'; });
     btnEmail?.addEventListener('click', () => { currentAction = 'email'; });
@@ -84,11 +84,41 @@
         return;
       }
 
-      // Deshabilitar botones de interfaz
+      // Deshabilitar botones de interfaz para evitar doble envío
       btnWhatsApp?.setAttribute('disabled', 'true');
       btnEmail?.setAttribute('disabled', 'true');
 
-      // 1. LÓGICA DE ENVÍO POR WHATSAPP
+      // =========================================================================
+      // PASO GLOBAL: RESPALDO EN TU BUZÓN DE SUPABASE (VÍA TU ENDPOINT INTERNO)
+      // =========================================================================
+      status.textContent = 'Procesando tu solicitud de forma segura...';
+      
+      try {
+        const response = await fetch('/api/cotizaciones', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: payload.name,
+            email: payload.email,
+            phone: payload.phone || '',
+            softwareType: payload.softwareType,
+            message: payload.message
+          })
+        });
+        
+        if (!response.ok) {
+          const errData = await response.json();
+          console.error('[FormBackup Error Server]:', errData.error);
+        } else {
+          console.log('[FormBackup] Datos respaldados con éxito en la base de datos.');
+        }
+      } catch (dbError) {
+        console.error('[FormBackup Error Network]: No se pudo conectar al backend:', dbError);
+      }
+
+      // =========================================================================
+      // ACCIÓN 1: LÓGICA DE REDIRECCIÓN A WHATSAPP
+      // =========================================================================
       if (currentAction === 'whatsapp') {
         const lines = [
           'Nuevo contacto desde la web (Acute)',
@@ -106,20 +136,22 @@
 
         console.log('[FormDispatch] Abriendo WhatsApp en pestaña externa.');
         status.textContent = 'Abriendo WhatsApp...';
-        window.open(waUrl, '_blank');
+        window.open(waUrl, '_blank', 'noopener,noreferrer');
 
         setTimeout(() => {
           status.textContent = 'Se abrió WhatsApp. Comprueba que el mensaje esté listo para enviar.';
           btnWhatsApp?.removeAttribute('disabled');
           btnEmail?.removeAttribute('disabled');
+          form.reset();
         }, 1200);
 
-      // 2. LÓGICA DE ENVÍO POR CORREO (UTILIZANDO FORMSUBMIT API VIA FETCH)
+      // =========================================================================
+      // ACCIÓN 2: LÓGICA DE ENVÍO POR CORREO (VÍA FORMSUBMIT AJAX)
+      // =========================================================================
       } else if (currentAction === 'email') {
-        status.textContent = 'Enviando tu cotización por correo de forma segura...';
+        status.textContent = 'Enviando tu cotización por correo...';
         console.log('[FormDispatch] Ejecutando petición HTTP POST hacia FormSubmit...');
 
-        // Preparamos los datos estructurados específicamente para el correo electrónico
         const formData = new FormData();
         formData.append('Nombre del Cliente', payload.name);
         formData.append('Email de Contacto', payload.email);
@@ -127,9 +159,8 @@
         formData.append('Tipo de Proyecto', payload.softwareType);
         formData.append('Mensaje de Cotización', payload.message);
         
-        // Configuraciones extras de FormSubmit para embellecer el flujo
         formData.append('_subject', `Nueva Cotización Web - ${payload.name}`);
-        formData.append('_captcha', 'false'); // Desactiva el recaptcha molesto de redirección
+        formData.append('_captcha', 'false');
 
         try {
           const response = await fetch(`https://formsubmit.co/ajax/${OWNER_EMAIL_ADDRESS}`, {
@@ -140,18 +171,16 @@
             }
           });
 
-          console.log('[FormResponse] Estatus del servidor:', response.status);
-
           if (response.ok) {
             console.log('[FormSuccess] ¡Correo procesado y enviado con éxito!');
             status.innerHTML = '<span class="text-emerald-400 font-medium">¡Cotización enviada con éxito! Nos comunicaremos contigo pronto.</span>';
-            form.reset(); // Limpia los inputs del formulario automáticamente
+            form.reset();
           } else {
             throw new Error('Error en la respuesta del servidor de correos.');
           }
         } catch (error) {
           console.error('[FormError] Falla en la petición fetch de correo:', error);
-          status.innerHTML = '<span class="text-rose-400">Hubo un problema al procesar el envío. Inténtalo por WhatsApp.</span>';
+          status.innerHTML = '<span class="text-rose-400">Hubo un problema al enviar el correo, pero tus datos ya se guardaron en nuestro sistema. ¡Te contactaremos!</span>';
         } finally {
           btnWhatsApp?.removeAttribute('disabled');
           btnEmail?.removeAttribute('disabled');

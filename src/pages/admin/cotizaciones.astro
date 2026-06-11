@@ -1,0 +1,221 @@
+---
+export const prerender = false; // Ejecución 100% en el servidor para leer datos reales
+
+import AdminLayout from '../../layouts/AdminLayout.astro'; // Ajusta la ruta según tu proyecto
+import { supabase } from '../../lib/supabase';
+
+// 1. Traer los mensajes de Supabase (Más reciente primero)
+const { data: cotizaciones, error } = await supabase
+  .from('cotizaciones')
+  .select('*')
+  .order('creado_at', { ascending: false });
+
+if (error) {
+  console.error("Error cargando cotizaciones:", error.message);
+}
+---
+
+<AdminLayout title="Buzón de Cotizaciones - Acute">
+  <div class="mx-auto max-w-6xl px-4 py-8">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+      <div>
+        <h1 class="text-3xl font-bold text-white tracking-tight">Gestión de Cotizaciones</h1>
+        <p class="text-slate-400 text-sm mt-1">Revisa, contacta y gestiona las solicitudes de tus clientes potenciales.</p>
+      </div>
+      
+      <!-- Contador rápido -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 flex items-center gap-3 self-start">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="text-xs font-medium text-slate-300">
+          {cotizaciones?.filter(c => !c.leido).length || 0} Pendientes
+        </span>
+      </div>
+    </div>
+
+    <!-- Lista de Mensajes -->
+    <div class="space-y-4" id="buzon-container">
+      {cotizaciones?.map((item) => {
+        // Extraemos el tipo de software si viene en el formato "[Tipo: xxx] Mensaje"
+        const matchSoftware = item.detalles_proyecto.match(/^\[Tipo:\s*([^\]]+)\]/);
+        const tipoSoftware = matchSoftware ? matchSoftware[1] : 'No especificado';
+        const mensajeLimpio = item.detalles_proyecto.replace(/^\[Tipo:\s*[^\]]+\]\s*/, '');
+
+        return (
+          <div 
+            data-id={item.id}
+            class={`group relative rounded-2xl border transition-all duration-300 bg-slate-950/40 p-6 ${
+              item.leido 
+                ? 'border-slate-800/60 opacity-75' 
+                : 'border-slate-800 bg-gradient-to-r from-blue-950/10 to-transparent border-l-brand-500 border-l-2'
+            }`}
+          >
+            <!-- Cabecera del Mensaje -->
+            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
+              <div>
+                <div class="flex items-center gap-3 flex-wrap">
+                  <h3 class="text-lg font-semibold text-white">{item.nombre}</h3>
+                  <span class={`text-xs uppercase tracking-wider px-2.5 py-0.5 rounded-md font-medium ${
+                    tipoSoftware === 'web' ? 'bg-blue-500/10 text-blue-400' :
+                    tipoSoftware === 'mobile' ? 'bg-purple-500/10 text-purple-400' :
+                    tipoSoftware === 'saas' ? 'bg-amber-500/10 text-amber-400' : 'bg-slate-800 text-slate-400'
+                  }`}>
+                    {tipoSoftware}
+                  </span>
+                  {!item.leido && (
+                    <span class="bg-brand-500/10 text-brand-400 text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded animate-pulse">
+                      Nuevo
+                    </span>
+                  )}
+                </div>
+                
+                <div class="flex items-center gap-4 text-xs text-slate-400 mt-1.5 flex-wrap">
+                  <span class="flex items-center gap-1.5">
+                    <span class="text-slate-500">📧</span> {item.correo}
+                  </span>
+                  {item.telefono && item.telefono !== 'No especificado' && (
+                    <span class="flex items-center gap-1.5">
+                      <span class="text-slate-500">📞</span> {item.telefono}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <!-- Fecha Formateada -->
+              <span class="text-xs text-slate-500 whitespace-nowrap bg-slate-900/60 px-3 py-1 rounded-lg border border-slate-800/40">
+                {new Date(item.creado_at).toLocaleDateString('es-MX', {
+                  day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+                })}
+              </span>
+            </div>
+
+            <!-- Cuerpo/Mensaje enviado -->
+            <div class="bg-slate-900/50 rounded-xl p-4 border border-slate-800/40 text-sm text-slate-300 leading-relaxed mb-5">
+              <p class="text-slate-500 text-xs font-medium uppercase tracking-wider mb-1.5">Requerimiento del proyecto:</p>
+              {mensajeLimpio}
+            </div>
+
+            <!-- Botones de Acción Internos -->
+            <div class="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-slate-900">
+              
+              <!-- Bloque 1: Responder (Izquierda) -->
+              <div class="flex items-center gap-2">
+                <!-- Responder por WhatsApp con plantilla integrada -->
+                <a 
+                  href={`https://wa.me/${item.telefono?.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${item.nombre}, gracias por contactar a Acute. Vi tu solicitud sobre el desarrollo de tu proyecto (${tipoSoftware})...`)}`}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500 px-4 py-2 text-xs font-semibold text-emerald-400 hover:text-white transition-all duration-300"
+                >
+                  💬 Responder por WhatsApp
+                </a>
+
+                <!-- Responder por Correo Tradicional -->
+                <a 
+                  href={`mailto:${item.correo}?subject=${encodeURIComponent(`Respuesta de Cotización - Acute`)}&body=${encodeURIComponent(`Hola ${item.nombre},\n\nGracias por escribirnos. Hemos revisado tu idea sobre la plataforma...`)}`}
+                  class="inline-flex items-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 px-4 py-2 text-xs font-semibold text-slate-300 hover:text-white transition-all duration-300 border border-slate-800"
+                >
+                  ✉️ Enviar Correo
+                </a>
+              </div>
+
+              <!-- Bloque 2: Estado del mensaje (Derecha) -->
+              <div class="flex items-center gap-2">
+                {!item.leido && (
+                  <button 
+                    data-action="read"
+                    data-id={item.id}
+                    class="rounded-xl bg-blue-500/10 hover:bg-blue-600 px-3 py-2 text-xs font-medium text-blue-400 hover:text-white transition-all duration-300"
+                  >
+                    ✓ Marcar leído
+                  </button>
+                )}
+                <button 
+                  data-action="delete"
+                  data-id={item.id}
+                  class="rounded-xl bg-rose-500/10 hover:bg-rose-600 px-3 py-2 text-xs font-medium text-rose-400 hover:text-white transition-all duration-300"
+                >
+                  🗑️ Eliminar
+                </button>
+              </div>
+
+            </div>
+          </div>
+        );
+      })}
+
+      {cotizaciones?.length === 0 && (
+        <div class="text-center py-16 bg-slate-900/20 rounded-2xl border border-slate-800/50">
+          <p class="text-slate-400 text-sm">El buzón está vacío. ¡Pronto llegarán nuevas cotizaciones!</p>
+        </div>
+      )}
+    </div>
+  </div>
+
+  <!-- Script Cliente para Marcar Leído y Eliminar de Forma Asíncrona sin Recargar -->
+  <script>
+    const container = document.getElementById('buzon-container');
+
+    container?.addEventListener('click', async (e) => {
+      const target = e.target as组件 HTMLElement;
+      const button = target.closest('button');
+      if (!button) return;
+
+      const id = button.getAttribute('data-id');
+      const action = button.getAttribute('data-action');
+      const card = button.closest('[data-id]');
+
+      if (!id || !card) return;
+
+      // --- ACCIÓN: MARCAR COMO LEÍDO ---
+      if (action === 'read') {
+        button.setAttribute('disabled', 'true');
+        button.textContent = 'Procesando...';
+
+        try {
+          // Reutilizaremos un método fetch o puedes apuntar a una pequeña API que actualice Supabase
+          const response = await fetch('/api/cotizaciones-status', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, leido: true })
+          });
+
+          if (response.ok) {
+            card.classList.add('border-slate-800/60', 'opacity-75');
+            card.classList.remove('border-l-brand-500', 'border-l-2');
+            button.remove(); // Quitamos el botón de marcar como leído
+            // Opcional: recargar ventana o decrementar el contador visual
+            window.location.reload();
+          }
+        } catch (err) {
+          console.error("Error al actualizar estado:", err);
+          button.removeAttribute('disabled');
+          button.textContent = '✓ Marcar leído';
+        }
+      }
+
+      // --- ACCIÓN: ELIMINAR COTIZACIÓN ---
+      if (action === 'delete') {
+        if (!confirm('¿Estás seguro de que deseas eliminar permanentemente esta cotización de la base de datos?')) return;
+        
+        button.setAttribute('disabled', 'true');
+        button.textContent = 'Eliminando...';
+
+        try {
+          const response = await fetch('/api/cotizaciones-status', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id })
+          });
+
+          if (response.ok) {
+            card.remove(); // Desaparece la tarjeta con una animación limpia
+          }
+        } catch (err) {
+          console.error("Error al eliminar requerimiento:", err);
+          button.removeAttribute('disabled');
+          button.textContent = '🗑️ Eliminar';
+        }
+      }
+    });
+  </script>
+</AdminLayout>

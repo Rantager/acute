@@ -1,6 +1,5 @@
 ---
 // Footer.astro - Pie de página profesional con 4 columnas, redes sociales y copyright
-// Incluye: Identidad, Enlaces Rápidos, Contacto, Redes Sociales y Copyright
 
 interface Props {
   companyName?: string;
@@ -14,11 +13,20 @@ const {
   companyName = 'Acute',
   companyDescription = 'Transformamos ideas en soluciones de software escalables y de alta calidad.',
   email = 'acutewebdesign7@gmail.com',
-  phone = '+51 (313) 106 8471',
+  phone = '+52 (313) 106 8671', // Actualizado con tu número correcto y lada de México (+52)
   location = 'Colima, México'
 } = Astro.props;
 
 const currentYear = new Date().getFullYear();
+
+// 1. Limpiamos el número de cualquier caracter que no sea dígito
+const cleanedPhone = phone.replace(/[^0-9]/g, '');
+
+// 2. Forzamos que use el formato correcto de WhatsApp para México (prefijo 52 + los 10 dígitos)
+// Si ya empieza con 52 y tiene 12 dígitos, lo dejamos así; si no, le agregamos el 52 al número de 10 dígitos.
+const whatsappNumber = cleanedPhone.startsWith('52') && cleanedPhone.length === 12 
+  ? cleanedPhone 
+  : `52${cleanedPhone.slice(-10)}`;
 ---
 
 <footer class="bg-slate-900 border-t border-slate-800/50 mt-20">
@@ -62,7 +70,6 @@ const currentYear = new Date().getFullYear();
               Proyectos
             </a>
           </li>
-          
         </ul>
       </div>
 
@@ -80,7 +87,6 @@ const currentYear = new Date().getFullYear();
               </svg>
               <span class="break-all">{email}</span>
             </a>
-            <!-- TODO: Reemplazar con el correo real de la empresa -->
           </li>
           <li>
             <a href={`tel:${phone.replace(/\s/g, '')}`} class="flex items-center gap-2 text-slate-400 hover:text-blue-400 transition-colors duration-300 text-sm font-medium group">
@@ -89,7 +95,6 @@ const currentYear = new Date().getFullYear();
               </svg>
               {phone}
             </a>
-            <!-- TODO: Reemplazar con el número real de la empresa -->
           </li>
           <li>
             <a href="#ubicacion" class="flex items-center gap-2 text-slate-400 hover:text-blue-400 transition-colors duration-300 text-sm font-medium group">
@@ -98,7 +103,6 @@ const currentYear = new Date().getFullYear();
               </svg>
               {location}
             </a>
-            <!-- TODO: Reemplazar con la ubicación real de la empresa -->
           </li>
         </ul>
       </div>
@@ -110,40 +114,25 @@ const currentYear = new Date().getFullYear();
         </h3>
         <div class="flex flex-wrap gap-3">
           <!-- Facebook -->
-          <a href="#" aria-label="Facebook" class="w-10 h-10 bg-slate-800 hover:bg-blue-600 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition-all duration-300 group hover:scale-110 hover:shadow-lg hover:shadow-blue-600/50">
+          <a href="https://www.facebook.com/profile.php?id=61590611070282" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="w-10 h-10 bg-slate-800 hover:bg-blue-600 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition-all duration-300 group hover:scale-110 hover:shadow-lg hover:shadow-blue-600/50">
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path>
             </svg>
           </a>
 
           <!-- Instagram -->
-          <a href="https://www.instagram.com/acutewd/" aria-label="Instagram" class="w-10 h-10 bg-slate-800 hover:bg-pink-600 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition-all duration-300 group hover:scale-110 hover:shadow-lg hover:shadow-pink-600/50">
+          <a href="https://www.instagram.com/acutewd/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="w-10 h-10 bg-slate-800 hover:bg-pink-600 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition-all duration-300 group hover:scale-110 hover:shadow-lg hover:shadow-pink-600/50">
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"></path>
             </svg>
           </a>
 
-          <!-- X (formerly Twitter) -->
-          <a href="#" aria-label="X (Twitter)" class="w-10 h-10 bg-slate-800 hover:bg-slate-700 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition-all duration-300 group hover:scale-110 hover:shadow-lg hover:shadow-slate-700/50">
+          <!-- WhatsApp (Nuevo Logo Limpio y Redirección al Chat) -->
+          <a href={`https://wa.me/${whatsappNumber}?text=Hola%20Acute!%20Me%20gustaría%20obtener%20más%20información%20sobre%20sus%20servicios.`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" class="w-10 h-10 bg-slate-800 hover:bg-green-600 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition-all duration-300 group hover:scale-110 hover:shadow-lg hover:shadow-green-600/50">
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.6l-5.195-6.791L2.306 21.75H-1.234l7.73-8.835L-1.618 2.25h6.63l4.888 6.467L18.244 2.25zM17.41 19.27h1.83L5.887 4.045H4.013L17.41 19.27z"></path>
+              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.4 0 12.008 0c3.202.001 6.212 1.246 8.477 3.513 2.263 2.268 3.507 5.28 3.503 8.487-.008 6.652-5.348 12-11.958 12-2.005-.001-3.973-.503-5.729-1.457L0 24zm6.59-4.046c1.654.982 3.511 1.5 5.409 1.5 5.315 0 9.642-4.327 9.648-9.647.003-2.577-1-5.002-2.82-6.825C17.06 3.16 14.636 2.16 12.01 2.16c-5.322 0-9.65 4.327-9.656 9.648-.001 2.02.527 3.991 1.53 5.733L2.895 21.19l3.752-1.236zM17.93 15.3c-.322-.16-1.905-.94-2.197-1.047-.294-.108-.507-.16-.72.16-.214.32-.828 1.047-1.014 1.26-.187.214-.373.24-.696.08-.322-.16-1.36-.5-2.59-1.6c-.957-.852-1.602-1.905-1.79-2.225-.186-.32-.02-.493.14-.654.146-.144.323-.374.484-.56.16-.188.214-.32.32-.534.108-.214.054-.4-.026-.56-.08-.16-.72-1.734-.987-2.374-.26-.625-.526-.54-.72-.55-.187-.01-.4-.01-.614-.01-.214 0-.56.08-.854.4-.294.32-1.12 1.1-1.12 2.678 0 1.578 1.147 3.1 1.307 3.32.16.214 2.257 3.447 5.467 4.837.763.33 1.357.527 1.82.674.766.244 1.463.21 2.013.127.614-.093 1.905-.78 2.172-1.496.267-.713.267-1.325.187-1.453-.08-.126-.294-.213-.615-.373z"/>
             </svg>
           </a>
-
-          <!-- LinkedIn -->
-          <a href="#" aria-label="LinkedIn" class="w-10 h-10 bg-slate-800 hover:bg-blue-700 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition-all duration-300 group hover:scale-110 hover:shadow-lg hover:shadow-blue-700/50">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.475-2.236-1.986-2.236-1.081 0-1.722.722-2.004 1.418-.103.249-.129.597-.129.946v5.441h-3.554s.05-8.81 0-9.728h3.554v1.375c.426-.658 1.189-1.592 2.894-1.592 2.113 0 3.695 1.381 3.695 4.352v5.593zM5.337 8.855c-1.144 0-1.915-.762-1.915-1.715 0-.955.77-1.715 1.916-1.715 1.144 0 1.915.76 1.915 1.715 0 .953-.771 1.715-1.915 1.715zm1.589 11.597H3.635V9.579h3.291v10.873zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"></path>
-            </svg>
-          </a>
-
-          <!-- WhatsApp -->
-          <a href="#" aria-label="WhatsApp" class="w-10 h-10 bg-slate-800 hover:bg-green-600 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition-all duration-300 group hover:scale-110 hover:shadow-lg hover:shadow-green-600/50">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-5.031 1.378c-3.055 2.364-3.905 6.75-1.9 10.247 1.915 3.305 5.604 4.969 9.156 4.143 3.236-.719 5.733-3.652 6.164-6.881.461-3.401-1.895-6.604-5.186-7.752-.856-.266-1.542-.278-2.203-.074z"></path>
-            </svg>
-          </a>
-          <!-- TODO: Reemplazar todos los href="#" con URLs reales de redes sociales -->
         </div>
       </div>
     </div>
@@ -164,7 +153,6 @@ const currentYear = new Date().getFullYear();
           Términos de Servicio
         </a>
       </div>
-      <!-- TODO: Reemplazar los links de Política de Privacidad y Términos de Servicio con URLs reales -->
     </div>
   </div>
 </footer>
