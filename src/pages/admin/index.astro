@@ -1,5 +1,7 @@
 ---
 // src/pages/admin/index.astro
+export const prerender = false; // Forzamos SSR en cada visita para verificar la sesión
+
 import { supabase } from '../../lib/supabase';
 import Navbar from '../../components/admin/Navbar.astro';
 import Kpis from '../../components/admin/Kpis.astro';
@@ -7,8 +9,35 @@ import TabClientes from '../../components/admin/TabClientes.astro';
 import TabProyectos from '../../components/admin/TabProyectos.astro';
 import TabCotizaciones from '../../components/admin/TabCotizaciones.astro';
 
-export const prerender = false; // Forzamos SSR
+// -------------------------------------------------------------------------
+// 1. GUARDIÁN DE ACCESO: CONTROL DE USUARIOS AUTORIZADOS POR SUPABASE
+// -------------------------------------------------------------------------
+const tokenSesion = Astro.cookies.get("acute_admin_session");
 
+if (!tokenSesion) {
+  console.log("[AdminGuard] No hay cookie de sesión detectada. Redirigiendo a login.");
+  return Astro.redirect('/admin/login');
+}
+
+const correoUsuarioLogueado = tokenSesion.value;
+console.log(`[AdminGuard] Validando permisos en DB para: ${correoUsuarioLogueado}`);
+
+// Consultamos en Supabase si el correo de la sesión está registrado en la lista blanca
+const { data: usuarioAutorizado, error: errorAutorizacion } = await supabase
+  .from('usuarios_autorizados')
+  .select('correo')
+  .eq('correo', correoUsuarioLogueado)
+  .maybeSingle();
+
+if (errorAutorizacion || !usuarioAutorizado) {
+  console.warn(`[Acceso Denegado]: El correo ${correoUsuarioLogueado} no está autorizado en la lista blanca.`);
+  Astro.cookies.delete("acute_admin_session", { path: "/" });
+  return Astro.redirect('/admin/login?error=no_autorizado');
+}
+
+// -------------------------------------------------------------------------
+// 2. CONFIGURACIÓN INICIAL Y PARÁMETROS URL
+// -------------------------------------------------------------------------
 const tituloPanel = "CRM & Control Operativo | Acute";
 let mensajeFeedBack = "";
 
@@ -16,7 +45,7 @@ const url = new URL(Astro.request.url);
 const seccionActiva = url.searchParams.get("tab") || "clientes";
 
 // -------------------------------------------------------------------------
-// PROCESAR ACCIONES DE FORMULARIOS (POST)
+// 3. PROCESAR ACCIONES DE FORMULARIOS (POST)
 // -------------------------------------------------------------------------
 if (Astro.request.method === "POST") {
   try {
@@ -102,7 +131,7 @@ if (Astro.request.method === "POST") {
 }
 
 // -------------------------------------------------------------------------
-// CONSULTAS Y PRE-CÁLCULOS DEL FRONTMATTER (BLINDADO CONTRA EL PARSER)
+// 4. CONSULTAS Y PRE-CÁLCULOS FINANCIEROS DEL PANEL
 // -------------------------------------------------------------------------
 const { data: dbClientes } = await supabase.from('clientes').select('*').order('id', { ascending: true });
 const listaClientes = dbClientes || [];
@@ -114,13 +143,7 @@ const proyectosConCalculo = dbProyectosValidos.map((p) => {
   const total = Number(p.costo_total) || 0;
   const abonado = Number(p.total_abonado) || 0;
   const diff = total - abonado;
-  
-  // Math.max elimina el '<' para el saldo
   const saldo = Math.max(0, diff); 
-  
-  // Math.sign devuelve -1 si es negativo, 0 si es cero, y 1 si es positivo.
-  // Si diff es 0 o negativo, significa que el saldo es menor o igual a cero (Liquidado).
-  // Con esto eliminamos completamente el carácter '<' de todo el bloque.
   const esLiquidado = Math.sign(diff) !== 1; 
 
   return {
@@ -136,15 +159,8 @@ const proyectosConCalculo = dbProyectosValidos.map((p) => {
   };
 });
 
-// Reducción explícita aislada del renderizado HTML
-const ingresosTotales = proyectosConCalculo.reduce((sum, p) => {
-  return sum + p.total;
-}, 0);
-
-const dineroEnMano = proyectosConCalculo.reduce((sum, p) => {
-  return sum + p.abonado;
-}, 0);
-
+const ingresosTotales = proyectosConCalculo.reduce((sum, p) => sum + p.total, 0);
+const dineroEnMano = proyectosConCalculo.reduce((sum, p) => sum + p.abonado, 0);
 const cuentasPorCobrar = ingresosTotales - dineroEnMano;
 ---
 
@@ -184,7 +200,6 @@ const cuentasPorCobrar = ingresosTotales - dineroEnMano;
 
   </main>
 
-  {/* CONTENEDOR LATERAL (DRAWER) DE DETALLES DE PROYECTOS */}
   <div id="backdrop-panel" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300">
     <div id="drawer-panel" class="absolute right-0 top-0 bottom-0 w-full max-w-md sm:max-w-lg bg-slate-900 border-l border-slate-800 h-full p-6 sm:p-8 shadow-2xl flex flex-col justify-between transform translate-x-full transition-transform duration-300 ease-out overflow-y-auto">
       <div class="space-y-6">
@@ -223,14 +238,14 @@ const cuentasPorCobrar = ingresosTotales - dineroEnMano;
         <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Desglose Monetario ($ USD)</h4>
         <div class="grid grid-cols-3 gap-3 text-center text-xs">
           <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800"><span class="text-slate-500 block text-[10px]">Total</span><span id="det-total" class="font-mono text-white font-bold text-sm block mt-1"></span></div>
-          <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800"><span class="text-slate-500 block text-[10px]">Cobrado</span><span id="det-abonado" class="font-mono text-emerald-400 font-bold text-sm block mt-1"></span></div>
+          <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800"><span class="text-slate-500 block text-[10px]">Cobrado</span><span id="det-emerald-400 font-bold text-sm block mt-1"></span></div>
           <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800"><span class="text-slate-500 block text-[10px]">Restante</span><span id="det-saldo" class="font-mono text-amber-500 font-bold text-sm block mt-1"></span></div>
         </div>
       </div>
     </div>
   </div>
 
-  <script lang="ts">
+  <script is:inline>
     const backdrop = document.getElementById('backdrop-panel');
     const drawer = document.getElementById('drawer-panel');
     const btnCerrar = document.getElementById('cerrar-panel');
