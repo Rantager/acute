@@ -10,11 +10,14 @@
 
 import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
-import vercel from '@astrojs/vercel/serverless'; // <-- Importación exacta para la versión 7
+import vercel from '@astrojs/vercel/serverless';
 
 // https://astro.build/config
 export default defineConfig({
   integrations: [tailwind()],
-  output: 'hybrid', // <-- Mantiene tu web comercial estática
-  adapter: vercel(), // <-- Conecta el backend con Vercel
+  output: 'hybrid', // Mantiene tu web comercial estática
+  adapter: vercel({
+    // Forzamos quirúrgicamente a que las Serverless Functions se compilen para Node 20
+    runtime: 'nodejs20.x'
+  }),
 });
