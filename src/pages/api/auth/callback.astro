@@ -1,0 +1,75 @@
+---
+// src/pages/api/auth/callback.astro
+export const prerender = false;
+---
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sincronizando Consola Central | Acute</title>
+  <link rel="icon" type="image/png" href="/img/acuteLogo.png" />
+</head>
+<body class="bg-[#0b1120] text-[#f8fafc] font-sans antialiased min-h-screen flex items-center justify-center m-0">
+  <div class="text-center p-6 max-w-sm">
+    <!-- Spinner animado premium -->
+    <div class="border-4 border-cyan-400/10 border-l-cyan-400 rounded-full w-12 h-12 animate-spin mx-auto mb-6"></div>
+    <h1 class="text-lg font-bold text-white mb-2">Estableciendo conexión segura...</h1>
+    <p class="text-slate-400 text-sm">Verificando credenciales con la consola de Supabase.</p>
+  </div>
+
+  <script>
+    import { supabase } from '../../../lib/supabase';
+
+    async function procesarSesionCliente() {
+      try {
+        const url = new URL(window.location.href);
+        const code = url.searchParams.get('code');
+        const oauthError = url.searchParams.get('error');
+        const errorDesc = url.searchParams.get('error_description');
+
+        if (oauthError) {
+          console.error("Error de OAuth:", oauthError, errorDesc);
+          window.location.href = '/admin/login?error=error_auth';
+          return;
+        }
+
+        if (code) {
+          // Intercambiar el código por sesión en el cliente (donde reside el code_verifier en localStorage)
+          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) {
+            console.error("Error al intercambiar código por sesión:", error);
+            window.location.href = '/admin/login?error=error_auth';
+            return;
+          }
+
+          if (data?.session?.user?.email) {
+            const emailReal = data.session.user.email.trim().toLowerCase();
+            // Inyectamos la cookie de forma limpia con el email real de Google para el guardián de index.astro
+            document.cookie = "acute_admin_session=" + encodeURIComponent(emailReal) + "; path=/; max-age=" + (60*60*24) + "; SameSite=Lax; Secure";
+            window.location.href = '/admin?tab=cotizaciones';
+            return;
+          }
+        }
+
+        // Fallback: Si no hay código pero sí hay sesión ya activa
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user?.email) {
+          const emailReal = session.user.email.trim().toLowerCase();
+          document.cookie = "acute_admin_session=" + encodeURIComponent(emailReal) + "; path=/; max-age=" + (60*60*24) + "; SameSite=Lax; Secure";
+          window.location.href = '/admin?tab=cotizaciones';
+        } else {
+          console.warn("No se encontró código ni sesión activa.");
+          window.location.href = '/admin/login?error=error_auth';
+        }
+      } catch (err) {
+        console.error("Error crítico en callback:", err);
+        window.location.href = '/admin/login?error=error_auth';
+      }
+    }
+
+    procesarSesionCliente();
+  </script>
+</body>
+</html>

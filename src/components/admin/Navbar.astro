@@ -1,13 +1,15 @@
 ---
 // src/components/admin/Navbar.astro
 const { seccionActiva } = Astro.props;
+const tokenSesion = Astro.cookies.get("acute_admin_session");
+const emailFromCookie = tokenSesion ? tokenSesion.value : "";
 ---
 <nav class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 backdrop-blur-md bg-opacity-80">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
       <div class="flex items-center gap-8">
         <div class="flex items-center gap-2">
-          <div class="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white text-lg tracking-wider">A</div>
+          <img src="/img/acuteLogo.png" alt="Acute Logo" class="h-8 w-8 object-contain" />
           <span class="font-bold text-xl text-white tracking-tight">Acute <span class="text-blue-500 text-xs font-mono">Control</span></span>
         </div>
         <div class="hidden md:flex space-x-1">
@@ -22,7 +24,142 @@ const { seccionActiva } = Astro.props;
           </a>
         </div>
       </div>
-      <span class="bg-slate-800 text-slate-400 text-xs font-mono px-3 py-1 rounded-full border border-slate-700">Enterprise CRM</span>
+      
+      <div class="flex items-center gap-4">
+        <span class="hidden sm:inline bg-slate-800/60 text-slate-400 text-[10px] uppercase tracking-wider font-mono px-3 py-1.5 rounded-full border border-slate-800/80">
+          Enterprise CRM
+        </span>
+        
+        <!-- Dropdown de Perfil Centralizado -->
+        <div class="relative" id="profile-dropdown-container">
+          <button 
+            id="profile-menu-button" 
+            class="flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500/50 rounded-full p-0.5 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            aria-expanded="false"
+            aria-haspopup="true"
+          >
+            <img 
+              id="user-avatar" 
+              class="w-8 h-8 rounded-full border border-slate-700 bg-slate-800 object-cover" 
+              src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z'/%3E%3C/svg%3E" 
+              alt="Avatar" 
+            />
+          </button>
+
+          <div 
+            id="profile-dropdown-menu" 
+            class="hidden absolute right-0 mt-2 w-64 rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl py-2 z-50 text-sm transform opacity-0 scale-95 transition-all duration-200"
+          >
+            <div class="px-4 py-3 border-b border-slate-800/80">
+              <p class="text-[10px] text-blue-400 font-bold uppercase tracking-wider font-mono">Consola Central</p>
+              <p id="user-name" class="font-semibold text-white truncate mt-1">Cargando...</p>
+              <p id="user-email" class="text-xs text-slate-400 truncate font-mono mt-0.5" data-cookie-email={emailFromCookie}>{emailFromCookie || 'Cargando...'}</p>
+            </div>
+            <div class="p-1">
+              <button 
+                id="btn-logout" 
+                class="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-colors font-semibold text-left"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 01-3-3h4a3 3 0 013 3v1" />
+                </svg>
+                Cerrar Sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </nav>
+
+<script>
+  import { supabase } from '../../lib/supabase';
+
+  const profileBtn = document.getElementById('profile-menu-button');
+  const dropdownMenu = document.getElementById('profile-dropdown-menu');
+
+  if (profileBtn && dropdownMenu) {
+    profileBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isHidden = dropdownMenu.classList.contains('hidden');
+      if (isHidden) {
+        dropdownMenu.classList.remove('hidden');
+        setTimeout(() => {
+          dropdownMenu.classList.remove('opacity-0', 'scale-95');
+          dropdownMenu.classList.add('opacity-100', 'scale-100');
+        }, 10);
+        profileBtn.setAttribute('aria-expanded', 'true');
+      } else {
+        ocultarDropdown();
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!dropdownMenu.contains(e.target as Node) && e.target !== profileBtn) {
+        ocultarDropdown();
+      }
+    });
+  }
+
+  function ocultarDropdown() {
+    if (!dropdownMenu || !profileBtn) return;
+    dropdownMenu.classList.remove('opacity-100', 'scale-100');
+    dropdownMenu.classList.add('opacity-0', 'scale-95');
+    profileBtn.setAttribute('aria-expanded', 'false');
+    setTimeout(() => {
+      dropdownMenu.classList.add('hidden');
+    }, 200);
+  }
+
+  async function cargarDatosPerfil() {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
+
+      const userAvatar = document.getElementById('user-avatar') as HTMLImageElement;
+      const userName = document.getElementById('user-name');
+      const userEmail = document.getElementById('user-email');
+
+      const emailCookie = userEmail?.getAttribute('data-cookie-email') || '';
+
+      if (user) {
+        const metadata = user.user_metadata || {};
+        const fullName = metadata.full_name || metadata.name || 'Administrador Acute';
+        const avatarUrl = metadata.avatar_url || metadata.picture || '';
+
+        if (userName) userName.textContent = fullName;
+        if (userEmail) userEmail.textContent = user.email || emailCookie;
+        if (userAvatar && avatarUrl) userAvatar.src = avatarUrl;
+      } else {
+        if (userName) userName.textContent = 'Administrador Acute';
+        if (userEmail && emailCookie) userEmail.textContent = emailCookie;
+      }
+    } catch (err) {
+      console.error("Error al cargar perfil de usuario:", err);
+    }
+  }
+
+  cargarDatosPerfil();
+
+  const btnLogout = document.getElementById('btn-logout');
+  if (btnLogout) {
+    btnLogout.addEventListener('click', async () => {
+      btnLogout.setAttribute('disabled', 'true');
+      btnLogout.innerHTML = 'Cerrando sesión...';
+      try {
+        await supabase.auth.signOut({ scope: 'local' });
+        localStorage.clear();
+        sessionStorage.clear();
+        document.cookie = "acute_admin_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax; Secure";
+        window.location.href = '/admin/login';
+      } catch (err) {
+        console.error("Error al cerrar sesión:", err);
+        alert("Error al cerrar sesión de forma segura.");
+        btnLogout.removeAttribute('disabled');
+        btnLogout.innerHTML = 'Cerrar Sesión';
+      }
+    });
+  }
+</script>
