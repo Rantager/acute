@@ -44,6 +44,11 @@ export const GET: APIRoute = async ({ url, cookies, redirect }) => {
   // -------------------------------------------------------------------------
   // FALLBACK INDUSTRIAL SI LLEGA EN FORMATO HASH (#) AL CLIENTE
   // -------------------------------------------------------------------------
+  // Reemplaza ÚNICAMENTE el bloque final de la respuesta Response en src/pages/api/auth/callback.ts
+
+  // -------------------------------------------------------------------------
+  // FALLBACK INDUSTRIAL SI LLEGA EN FORMATO HASH (#) AL CLIENTE
+  // -------------------------------------------------------------------------
   console.warn("[AuthCallback] URL de servidor limpia. Ejecutando extractor dinámico en cliente...");
   
   return new Response(
@@ -60,8 +65,8 @@ export const GET: APIRoute = async ({ url, cookies, redirect }) => {
         <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
         
         <script type="module">
-          // Importamos el cliente de Supabase configurado en tu proyecto
-          import { supabase } from '/src/lib/supabase.ts';
+          // ¡SOLUCIÓN! Cambiamos la ruta absoluta rota por una ruta relativa calculada desde la URL de la app
+          import { supabase } from '../../lib/supabase.ts';
 
           async function procesarSesionCliente() {
             try {
