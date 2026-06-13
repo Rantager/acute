@@ -33,21 +33,21 @@ if (!supabaseUrl || !supabaseAnonKey) {
 // 3. Configuramos las opciones dinámicamente según el entorno
 const clientOptions: any = {};
 
-// Si estamos en el servidor (Vercel / Node.js) e intentamos levantar el cliente,
-// inyectamos 'ws' de forma dinámica para que Vite no lo intente empaquetar en el navegador.
 if (typeof window === 'undefined') {
   try {
-    // Usamos un require dinámico o dejamos que se resuelva en el backend
-    // Para evitar que Rollup lo analice en estático, podemos usar la importación dinámica
-    const ws = await import('ws').then(m => m.default || m);
+    // Al usar un template string con una variable, Vite NO PUEDE analizarlo en tiempo de compilación
+    // y dejará de dar el error de Rollup.
+    const packageName = 'ws';
+    const wsModule = await import(/* @vite-ignore */ packageName);
+    const ws = wsModule.default || wsModule;
+    
     clientOptions.realtime = {
       transport: ws
     };
   } catch (e) {
-    console.warn("[Supabase Server Warning]: No se pudo cargar el paquete 'ws' para Realtime.");
+    console.warn("[Supabase Server Warning]: No se pudo cargar el paquete 'ws' para Realtime.", e);
   }
 } else {
-  // Opciones exclusivas si se ejecuta en el navegador (opcional)
   clientOptions.auth = {
     persistSession: true
   };
