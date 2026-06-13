@@ -19,6 +19,9 @@ if (typeof window === 'undefined') {
   clientOptions.auth = {
     persistSession: false
   };
+  clientOptions.realtime = {
+    transport: class {}
+  };
 } else {
   clientOptions.auth = {
     persistSession: true
