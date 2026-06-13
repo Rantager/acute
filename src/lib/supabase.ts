@@ -15,7 +15,6 @@
 
 // // 3. Exportamos la instancia única del cliente para toda la app
 // export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
 import { createClient } from '@supabase/supabase-js';
 
 // 1. Intentamos leer las variables del servidor de Astro o inyectadas por Vite para el cliente
@@ -34,19 +33,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
 const clientOptions: any = {};
 
 if (typeof window === 'undefined') {
-  try {
-    // Al usar un template string con una variable, Vite NO PUEDE analizarlo en tiempo de compilación
-    // y dejará de dar el error de Rollup.
-    const packageName = 'ws';
-    const wsModule = await import(/* @vite-ignore */ packageName);
-    const ws = wsModule.default || wsModule;
-    
-    clientOptions.realtime = {
-      transport: ws
-    };
-  } catch (e) {
-    console.warn("[Supabase Server Warning]: No se pudo cargar el paquete 'ws' para Realtime.", e);
-  }
+  // En el servidor cargamos ws con un import estándar. 
+  // Gracias al astro.config.mjs, esto no romperá el cliente.
+  const ws = await import('ws').then(m => m.default || m);
+  clientOptions.realtime = {
+    transport: ws
+  };
 } else {
   clientOptions.auth = {
     persistSession: true
