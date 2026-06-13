@@ -27,10 +27,13 @@ export default defineConfig({
     runtime: 'nodejs20.x'
   }),
   
-  // Agregamos esta sección para ganarle la batalla a Vite y Vercel
   vite: {
-    ssr: {
-      external: ['ws'] // Le dice a Vite que no toque 'ws' en el cliente, y a Vercel que lo instale en Node 20
+    build: {
+      rollupOptions: {
+        // Esto le dice a Rollup de forma global (exactamente lo que pide el error en tu log):
+        // "Si ves el paquete 'ws', no intentes resolverlo ni meterlo en ningún bundle"
+        external: ['ws']
+      }
     }
   }
 });

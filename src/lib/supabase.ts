@@ -15,6 +15,8 @@
 
 // // 3. Exportamos la instancia única del cliente para toda la app
 // export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+
 import { createClient } from '@supabase/supabase-js';
 
 // 1. Intentamos leer las variables del servidor de Astro o inyectadas por Vite para el cliente
@@ -33,12 +35,18 @@ if (!supabaseUrl || !supabaseAnonKey) {
 const clientOptions: any = {};
 
 if (typeof window === 'undefined') {
-  // En el servidor cargamos ws con un import estándar. 
-  // Gracias al astro.config.mjs, esto no romperá el cliente.
-  const ws = await import('ws').then(m => m.default || m);
-  clientOptions.realtime = {
-    transport: ws
-  };
+  try {
+    // Al usar una variable externa para el nombre, el compilador global no lo asocia a un archivo estático
+    const moduleName = 'ws';
+    const wsModule = await import(moduleName);
+    const ws = wsModule.default || wsModule;
+    
+    clientOptions.realtime = {
+      transport: ws
+    };
+  } catch (e) {
+    console.warn("[Supabase Server Warning]: No se pudo cargar el paquete 'ws' para Realtime.", e);
+  }
 } else {
   clientOptions.auth = {
     persistSession: true
