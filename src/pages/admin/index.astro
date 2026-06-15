@@ -38,11 +38,15 @@ if (errorAutorizacion || !usuarioAutorizado) {
 // -------------------------------------------------------------------------
 // 2. CONFIGURACIÓN INICIAL Y PARÁMETROS URL
 // -------------------------------------------------------------------------
-const tituloPanel = "CRM & Control Operativo | Acute";
-let mensajeFeedBack = "";
-
 const url = new URL(Astro.request.url);
 const seccionActiva = url.searchParams.get("tab") || "clientes";
+
+const tituloPanel = 
+  seccionActiva === "clientes" ? "Acute | Clientes" :
+  seccionActiva === "proyectos" ? "Acute | Finanzas" :
+  seccionActiva === "cotizaciones" ? "Acute | Cotizaciones" :
+  "Acute | Dashboard";
+let mensajeFeedBack = "";
 
 // -------------------------------------------------------------------------
 // 3. PROCESAR ACCIONES DE FORMULARIOS (POST)

@@ -1,5 +1,6 @@
 ---
 // Footer.astro - Pie de página profesional con 4 columnas, redes sociales y copyright
+import logoSvg from '../assets/acute.af?url';
 
 interface Props {
   companyName?: string;
@@ -10,7 +11,7 @@ interface Props {
 }
 
 const {
-  companyName = 'Acute',
+  companyName = 'Acut',
   companyDescription = 'Transformamos ideas en soluciones de software escalables y de alta calidad.',
   email = 'acutewebdesign7@gmail.com',
   phone = '+52 (313) 106 8671', // Actualizado con tu número correcto y lada de México (+52)
@@ -29,7 +30,7 @@ const whatsappNumber = cleanedPhone.startsWith('52') && cleanedPhone.length === 
   : `52${cleanedPhone.slice(-10)}`;
 ---
 
-<footer class="bg-slate-900 border-t border-slate-800/50 mt-20">
+<footer class="bg-[#0b1120] border-t border-slate-800/50 mt-20">
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
     
     <!-- Main Footer Content (4 Columns) -->
@@ -38,15 +39,12 @@ const whatsappNumber = cleanedPhone.startsWith('52') && cleanedPhone.length === 
       <!-- Column 1: Identidad de la Empresa -->
       <div class="space-y-4">
         <div class="flex items-center gap-2 mb-4">
-          <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center font-bold text-white text-sm">
-            A
-          </div>
-          <span class="text-lg font-bold text-slate-100">{companyName}</span>
+          <img src="/img/logo.svg" alt="Acute Logo" class="w-16 h-16 object-contain" />
+          <span class="text-lg font-bold text-slate-100"></span>
         </div>
         <p class="text-slate-400 text-sm leading-relaxed">
           {companyDescription}
         </p>
-        <!-- TODO: Reemplazar con el logo definitivo de la empresa -->
       </div>
 
       <!-- Column 2: Enlaces Rápidos -->
