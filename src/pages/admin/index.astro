@@ -7,7 +7,7 @@ import Navbar from '../../components/admin/Navbar.astro';
 import Kpis from '../../components/admin/Kpis.astro';
 import TabClientes from '../../components/admin/TabClientes.astro';
 import TabProyectos from '../../components/admin/TabProyectos.astro';
-import TabCotizaciones from '../../components/admin/TabCotizaciones.astro';
+import TabMensajes from '../../components/admin/TabMensajes.astro';
 
 // -------------------------------------------------------------------------
 // 1. GUARDIÁN DE ACCESO: CONTROL DE USUARIOS AUTORIZADOS POR SUPABASE
@@ -44,7 +44,7 @@ const seccionActiva = url.searchParams.get("tab") || "clientes";
 const tituloPanel = 
   seccionActiva === "clientes" ? "Acute | Clientes" :
   seccionActiva === "proyectos" ? "Acute | Finanzas" :
-  seccionActiva === "cotizaciones" ? "Acute | Cotizaciones" :
+  seccionActiva === "mensajes" ? "Acute | Mensajes" :
   "Acute | Dashboard";
 let mensajeFeedBack = "";
 
@@ -199,8 +199,8 @@ const cuentasPorCobrar = ingresosTotales - dineroEnMano;
       </div>
     )}
 
-    {seccionActiva === "cotizaciones" && (
-      <TabCotizaciones />
+    {seccionActiva === "mensajes" && (
+      <TabMensajes />
     )}
 
   </main>

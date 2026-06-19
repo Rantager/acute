@@ -1,37 +1,37 @@
 ---
-// src/components/admin/TabCotizaciones.astro
+// src/components/admin/TabMensajes.astro
 import { supabase } from '../../lib/supabase';
 
 // Traemos los mensajes ordenados cronológicamente (más recientes arriba)
-const { data: cotizaciones, error } = await supabase
-  .from('cotizaciones')
+const { data: mensajes, error } = await supabase
+  .from('mensajes_contacto')
   .select('*')
   .order('creado_at', { ascending: false });
 
 if (error) {
-  console.error("Error cargando cotizaciones:", error.message);
+  console.error("Error cargando mensajes:", error.message);
 }
 
-const listaCotizaciones = cotizaciones || [];
+const listaMensajes = mensajes || [];
 ---
 
 <div class="space-y-6">
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     <div>
-      <h2 class="text-2xl font-bold text-white tracking-tight">Gestión de Cotizaciones</h2>
+      <h2 class="text-2xl font-bold text-white tracking-tight">Gestión de Mensajes</h2>
       <p class="text-slate-400 text-sm mt-1">Revisa, contacta y convierte las solicitudes de tus clientes potenciales.</p>
     </div>
     
     <div class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 flex items-center gap-3 self-start">
       <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
       <span class="text-xs font-medium text-slate-300">
-        {listaCotizaciones.filter(c => !c.leido).length} Pendientes
+        {listaMensajes.filter(c => !c.leido).length} Pendientes
       </span>
     </div>
   </div>
 
   <div class="space-y-4" id="buzon-container">
-    {listaCotizaciones.map((item) => {
+    {listaMensajes.map((item) => {
       const itemId = item.id ? String(item.id) : '';
       if (!itemId) return null;
 
@@ -46,7 +46,7 @@ const listaCotizaciones = cotizaciones || [];
           })
         : 'Fecha no registrada';
 
-      const subjectMail = "Respuesta de Cotización - Acute";
+      const subjectMail = "Respuesta de Contacto - Acute";
       const bodyMail = `Hola ${item.nombre},\n\nMuchas gracias por escribirnos. Analizamos los detalles de tu requerimiento para el proyecto de tipo ${tipoSoftware} y nos gustaría agendar una breve reunión para detallar la propuesta comercial.\n\nQuedamos a tus órdenes.\nAtentamente,\nEquipo Acute`;
 
       return (
@@ -179,7 +179,7 @@ const listaCotizaciones = cotizaciones || [];
       );
     })}
 
-    {listaCotizaciones.length === 0 && (
+    {listaMensajes.length === 0 && (
       <div class="text-center py-16 bg-slate-900/20 rounded-2xl border border-slate-800/50">
         <p class="text-slate-400 text-sm">El buzón está vacío de momento.</p>
       </div>
@@ -218,7 +218,7 @@ const listaCotizaciones = cotizaciones || [];
         button.textContent = 'Actualizando...';
 
         try {
-          const res = await fetch('/api/cotizaciones', {
+          const res = await fetch('/api/mensajes-contacto', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: String(id), leido: true })
@@ -239,16 +239,16 @@ const listaCotizaciones = cotizaciones || [];
         }
       }
 
-      // ACCIÓN: ELIMINAR COTIZACIÓN
+      // ACCIÓN: ELIMINAR MENSAJE
       if (action === 'delete') {
-        if (!confirm('¿Eliminar esta cotización permanentemente?')) return;
+        if (!confirm('¿Eliminar este mensaje permanentemente?')) return;
         
         button.setAttribute('disabled', 'true');
         const originalContent = button.innerHTML;
         button.textContent = 'Eliminando...';
 
         try {
-          const res = await fetch('/api/cotizaciones', {
+          const res = await fetch('/api/mensajes-contacto', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: String(id) })

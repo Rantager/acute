@@ -1,10 +1,10 @@
-// src/pages/api/cotizaciones.ts
+// src/pages/api/mensajes-contacto.ts
 export const prerender = false;
 
 import type { APIRoute } from 'astro';
 import { supabase } from '../../lib/supabase';
 
-// 1. GUARDAR NUEVA COTIZACIÓN (Formulario Público)
+// 1. GUARDAR NUEVO MENSAJE DE CONTACTO (Formulario Público)
 export const POST: APIRoute = async ({ request }) => {
   try {
     const data = await request.json();
@@ -17,7 +17,7 @@ export const POST: APIRoute = async ({ request }) => {
     const detallesCompletos = `[Tipo: ${softwareType || 'No especificado'}] ${message}`;
 
     const { error } = await supabase
-      .from('cotizaciones')
+      .from('mensajes_contacto')
       .insert([{ 
         nombre: name, 
         correo: email, 
@@ -30,7 +30,7 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: error.message }), { status: 500 });
     }
 
-    return new Response(JSON.stringify({ message: 'Cotización guardada exitosamente' }), { status: 200 });
+    return new Response(JSON.stringify({ message: 'Mensaje guardado exitosamente' }), { status: 200 });
   } catch (error) {
     console.error('[API Error POST]:', error);
     return new Response(JSON.stringify({ error: 'Error interno del servidor' }), { status: 500 });
@@ -48,7 +48,7 @@ export const PATCH: APIRoute = async ({ request }) => {
     }
 
     const { data, error } = await supabase
-      .from('cotizaciones')
+      .from('mensajes_contacto')
       .update({ leido: leido })
       .eq('id', String(id))
       .select();
@@ -62,7 +62,7 @@ export const PATCH: APIRoute = async ({ request }) => {
   }
 };
 
-// 3. ELIMINAR COTIZACIÓN (Panel de Administración)
+// 3. ELIMINAR MENSAJE (Panel de Administración)
 export const DELETE: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
@@ -73,7 +73,7 @@ export const DELETE: APIRoute = async ({ request }) => {
     }
 
     const { error } = await supabase
-      .from('cotizaciones')
+      .from('mensajes_contacto')
       .delete()
       .eq('id', String(id));
 
