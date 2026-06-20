@@ -1,5 +1,4 @@
 ---
-// src/components/admin/Navbar.astro
 const { seccionActiva } = Astro.props;
 const tokenSesion = Astro.cookies.get("acute_admin_session");
 const emailFromCookie = tokenSesion ? tokenSesion.value : "";
@@ -30,6 +29,7 @@ const emailFromCookie = tokenSesion ? tokenSesion.value : "";
           <span class="font-bold text-xl text-white tracking-tight"></span>
         </div>
 
+        {/* --- DESKTOP MENU --- */}
         <div class="hidden md:flex space-x-1">
           <a href="?tab=clientes" class={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${seccionActiva === 'clientes' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
             Clientes
@@ -39,6 +39,10 @@ const emailFromCookie = tokenSesion ? tokenSesion.value : "";
           </a>
           <a href="?tab=mensajes" class={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${seccionActiva === 'mensajes' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
             Gestionar Mensajes 
+          </a>
+          {/* NUEVO BOTÓN: Cotizaciones Escritorio */}
+          <a href="?tab=cotizaciones" class={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${seccionActiva === 'cotizaciones' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
+            Cotizaciones
           </a>
         </div>
       </div>
@@ -90,6 +94,7 @@ const emailFromCookie = tokenSesion ? tokenSesion.value : "";
     </div>
   </div>
 
+  {/* --- MENÚ MÓVIL --- */}
   <div id="mobile-menu" class="hidden md:hidden bg-slate-950 border-t border-slate-800/60 px-4 py-3 space-y-2 shadow-inner">
     <a href="?tab=clientes" class={`block px-4 py-3 rounded-xl text-base font-medium transition-colors ${seccionActiva === 'clientes' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
       Clientes
@@ -99,6 +104,10 @@ const emailFromCookie = tokenSesion ? tokenSesion.value : "";
     </a>
     <a href="?tab=mensajes" class={`block px-4 py-3 rounded-xl text-base font-medium transition-colors ${seccionActiva === 'mensajes' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
       Gestionar Mensajes
+    </a>
+    {/* NUEVO BOTÓN: Cotizaciones Móvil */}
+    <a href="?tab=cotizaciones" class={`block px-4 py-3 rounded-xl text-base font-medium transition-colors ${seccionActiva === 'cotizaciones' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
+      Cotizaciones
     </a>
   </div>
 </nav>
@@ -117,13 +126,11 @@ const emailFromCookie = tokenSesion ? tokenSesion.value : "";
       const isExpanded = mobileMenuBtn.getAttribute('aria-expanded') === 'true';
       
       if (isExpanded) {
-        // Cerrar menú móvil
         mobileMenu.classList.add('hidden');
         hamburgerIcon.classList.remove('hidden');
         closeIcon.classList.add('hidden');
         mobileMenuBtn.setAttribute('aria-expanded', 'false');
       } else {
-        // Abrir menú móvil
         mobileMenu.classList.remove('hidden');
         hamburgerIcon.classList.add('hidden');
         closeIcon.classList.remove('hidden');

@@ -1,0 +1,26 @@
+---
+import { supabase } from '../../lib/supabase';
+import ContenedorCotizaciones from './cotizaciones/ContenedorCotizaciones';
+
+// Traemos los mensajes/prospectos de la base de datos para tratarlos como clientes en esta sección
+const { data: dbMensajes, error } = await supabase
+  .from('mensajes_contacto')
+  .select('id, nombre, correo, telefono')
+  .order('nombre', { ascending: true });
+
+if (error) {
+  console.error('[TabCotizaciones SQL Error]:', error.message);
+}
+
+const clientesMapeados = dbMensajes || [];
+---
+
+<div className="space-y-4 w-full">
+  <div class="flex flex-col gap-1 mb-2">
+    <h1 class="text-2xl font-bold tracking-tight text-white">Gestión de Cotizaciones</h1>
+    <p class="text-xs text-slate-400">Selecciona un prospecto para redactar propuestas formales de desarrollo de software o ver presupuestos emitidos.</p>
+  </div>
+
+  <!-- Cargamos el contenedor reactivo pasándole los datos iniciales desde el servidor -->
+  <ContenedorCotizaciones clientesIniciales={clientesMapeados} client:load />
+</div>
