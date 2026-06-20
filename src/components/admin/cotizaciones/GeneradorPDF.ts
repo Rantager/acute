@@ -71,7 +71,7 @@ export function generarCotizacionPDF(cliente: Cliente, cot: Cotizacion) {
     doc.setFontSize(8);
     doc.setTextColor(COLOR_TEXT_MUTED[0], COLOR_TEXT_MUTED[1], COLOR_TEXT_MUTED[2]);
 
-    const footerText = `Gracias por la confianza.  |  Acute  |  contacto@acute.mx  |  acute.mx`;
+    const footerText = `Gracias por la confianza.  |  Acute  |  acutewebdesign7@gmail.com |  acute.mx`;
     doc.text(footerText, pageWidth / 2, pageHeight - 12, { align: 'center' });
   };
 
@@ -97,8 +97,7 @@ export function generarCotizacionPDF(cliente: Cliente, cot: Cotizacion) {
   doc.setFontSize(9);
   doc.setTextColor(COLOR_TEXT_MUTED[0], COLOR_TEXT_MUTED[1], COLOR_TEXT_MUTED[2]);
 
-  doc.text('Acute', margin, y);
-  doc.text('contacto@acute.mx', margin, y + 4.5);
+  doc.text('acutewebdesign7@gmail.com', margin, y + 4.5);
   doc.text('Colima, México', margin, y + 9);
   doc.text('acute.mx', margin, y + 13.5);
 
