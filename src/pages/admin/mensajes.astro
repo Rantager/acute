@@ -4,34 +4,34 @@ export const prerender = false; // Ejecución 100% en el servidor para leer dato
 import { supabase } from '../../lib/supabase';
 
 // 1. Traer los mensajes de Supabase (Más reciente primero)
-const { data: cotizaciones, error } = await supabase
-  .from('cotizaciones')
+const { data: mensajes, error } = await supabase
+  .from('mensajes_contacto')
   .select('*')
   .order('creado_at', { ascending: false });
 
 if (error) {
-  console.error("Error cargando cotizaciones:", error.message);
+  console.error("Error cargando mensajes:", error.message);
 }
 ---
 
-<AdminLayout title="Buzón de Cotizaciones - Acute">
+<AdminLayout title="Mensajes">
   <div class="mx-auto max-w-6xl px-4 py-8">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
       <div>
-        <h1 class="text-3xl font-bold text-white tracking-tight">Gestión de Cotizaciones</h1>
-        <p class="text-slate-400 text-sm mt-1">Revisa, contacta y gestiona las solicitudes de tus clientes potenciales.</p>
+        <h1 class="text-3xl font-bold text-white tracking-tight">Gestión de Mensajes</h1>
+        <p class="text-slate-400 text-sm mt-1">Revisa, contacta y gestiona los mensajes de tus clientes potenciales.</p>
       </div>
       
       <div class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 flex items-center gap-3 self-start">
         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
         <span class="text-xs font-medium text-slate-300">
-          {cotizaciones?.filter(c => !c.leido).length || 0} Pendientes
+          {mensajes?.filter(c => !c.leido).length || 0} Pendientes
         </span>
       </div>
     </div>
 
     <div class="space-y-4" id="buzon-container">
-      {cotizaciones?.map((item) => {
+      {mensajes?.map((item) => {
         // Extraemos el tipo de software si viene en el formato "[Tipo: xxx] Mensaje"
         const matchSoftware = item.detalles_proyecto.match(/^\[Tipo:\s*([^\]]+)\]/);
         const tipoSoftware = matchSoftware ? matchSoftware[1] : 'No especificado';
@@ -101,7 +101,7 @@ if (error) {
                 </a>
 
                 <a 
-                  href={`mailto:${item.correo}?subject=${encodeURIComponent(`Respuesta de Cotización - Acute`)}&body=${encodeURIComponent(`Hola ${item.nombre},\n\nGracias por escribirnos. Hemos revisado tu idea sobre la plataforma...`)}`}
+                  href={`mailto:${item.correo}?subject=${encodeURIComponent(`Respuesta de Contacto - Acute`)}&body=${encodeURIComponent(`Hola ${item.nombre},\n\nGracias por escribirnos. Hemos revisado tu idea sobre la plataforma...`)}`}
                   class="inline-flex items-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 px-4 py-2 text-xs font-semibold text-slate-300 hover:text-white transition-all duration-300 border border-slate-800"
                 >
                   ✉️ Enviar Correo
@@ -132,9 +132,9 @@ if (error) {
         );
       })}
 
-      {cotizaciones?.length === 0 && (
+      {mensajes?.length === 0 && (
         <div class="text-center py-16 bg-slate-900/20 rounded-2xl border border-slate-800/50">
-          <p class="text-slate-400 text-sm">El buzón está vacío. ¡Pronto llegarán nuevas cotizaciones!</p>
+          <p class="text-slate-400 text-sm">El buzón está vacío. ¡Pronto llegarán nuevos mensajes!</p>
         </div>
       )}
     </div>
@@ -144,7 +144,7 @@ if (error) {
     const container = document.getElementById('buzon-container');
 
     container?.addEventListener('click', async (e) => {
-      const target = e.target as HTMLElement; // ¡CORREGIDO! Eliminado el typo del caracter '组件'
+      const target = e.target as HTMLElement;
       const button = target.closest('button');
       if (!button) return;
 
@@ -160,7 +160,7 @@ if (error) {
         button.textContent = 'Procesando...';
 
         try {
-          const response = await fetch('/api/cotizaciones-status', {
+          const response = await fetch('/api/mensajes-status', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id, leido: true })
@@ -179,15 +179,15 @@ if (error) {
         }
       }
 
-      // --- ACCIÓN: ELIMINAR COTIZACIÓN ---
+      // --- ACCIÓN: ELIMINAR MENSAJE ---
       if (action === 'delete') {
-        if (!confirm('¿Estás seguro de que deseas eliminar permanentemente esta cotización de la base de datos?')) return;
+        if (!confirm('¿Estás seguro de que deseas eliminar permanentemente este mensaje de la base de datos?')) return;
         
         button.setAttribute('disabled', 'true');
         button.textContent = 'Eliminando...';
 
         try {
-          const response = await fetch('/api/cotizaciones-status', {
+          const response = await fetch('/api/mensajes-status', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id })
@@ -197,7 +197,7 @@ if (error) {
             card.remove();
           }
         } catch (err) {
-          console.error("Error al eliminar requerimiento:", err);
+          console.error("Error al eliminar mensaje:", err);
           button.removeAttribute('disabled');
           button.textContent = '🗑️ Eliminar';
         }

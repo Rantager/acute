@@ -1,7 +1,7 @@
 ---
 const { title, description, image } = Astro.props;
 const siteUrl = 'https://www.acute.dev';
-const pageTitle = title ? `${title} | Acute` : 'Acute | Desarrollo de software a medida';
+const pageTitle = title ? `Acute | ${title}` : 'Acute | Desarrollo';
 const pageDescription = description ?? 'Acute diseña aplicaciones web y sistemas escalables con enfoque en rendimiento, calidad y experiencia de usuario.';
 const pageImage = image ?? `${siteUrl}/og-image.png`;
 import '../styles/global.css';

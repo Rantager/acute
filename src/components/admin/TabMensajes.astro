@@ -1,0 +1,280 @@
+---
+// src/components/admin/TabMensajes.astro
+import { supabase } from '../../lib/supabase';
+
+// Traemos los mensajes ordenados cronológicamente (más recientes arriba)
+const { data: mensajes, error } = await supabase
+  .from('mensajes_contacto')
+  .select('*')
+  .order('creado_at', { ascending: false });
+
+if (error) {
+  console.error("Error cargando mensajes:", error.message);
+}
+
+const listaMensajes = mensajes || [];
+---
+
+<div class="space-y-6">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h2 class="text-2xl font-bold text-white tracking-tight">Gestión de Mensajes</h2>
+      <p class="text-slate-400 text-sm mt-1">Revisa, contacta y convierte las solicitudes de tus clientes potenciales.</p>
+    </div>
+    
+    <div class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 flex items-center gap-3 self-start">
+      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      <span class="text-xs font-medium text-slate-300">
+        {listaMensajes.filter(c => !c.leido).length} Pendientes
+      </span>
+    </div>
+  </div>
+
+  <div class="space-y-4" id="buzon-container">
+    {listaMensajes.map((item) => {
+      const itemId = item.id ? String(item.id) : '';
+      if (!itemId) return null;
+
+      const detalles = item.detalles_proyecto || '';
+      const matchSoftware = detalles.match(/^\[Tipo:\s*([^\]]+)\]/);
+      const tipoSoftware = matchSoftware ? matchSoftware[1] : 'No especificado';
+      const mensajeLimpio = detalles.replace(/^\[Tipo:\s*[^\]]+\]\s*/, '') || 'Sin descripción detallada';
+
+      const fechaFormateada = item.creado_at 
+        ? new Date(item.creado_at).toLocaleDateString('es-MX', {
+            day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+          })
+        : 'Fecha no registrada';
+
+      const subjectMail = "Respuesta de Contacto - Acute";
+      const bodyMail = `Hola ${item.nombre},\n\nMuchas gracias por escribirnos. Analizamos los detalles de tu requerimiento para el proyecto de tipo ${tipoSoftware} y nos gustaría agendar una breve reunión para detallar la propuesta comercial.\n\nQuedamos a tus órdenes.\nAtentamente,\nEquipo Acute`;
+
+      return (
+        /* Tarjeta principal con identificador único de clase para el borrado */
+        <div 
+          data-id={itemId}
+          class={`tarjeta-cotizacion group relative rounded-2xl border transition-all duration-300 bg-slate-950/40 p-6 ${
+            item.leido 
+              ? 'border-slate-800/60 opacity-75' 
+              : 'border-slate-800 bg-gradient-to-r from-blue-950/10 to-transparent border-l-2 border-l-blue-500'
+          }`}
+        >
+          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
+            <div>
+              <div class="flex items-center gap-3 flex-wrap">
+                <h3 class="text-lg font-semibold text-white">{item.nombre || 'Cliente sin nombre'}</h3>
+                <span class={`text-xs uppercase tracking-wider px-2.5 py-0.5 rounded-md font-medium ${
+                  tipoSoftware === 'web' ? 'bg-blue-500/10 text-blue-400' :
+                  tipoSoftware === 'mobile' ? 'bg-purple-500/10 text-purple-400' :
+                  tipoSoftware === 'saas' ? 'bg-amber-500/10 text-amber-400' : 'bg-slate-800 text-slate-400'
+                }`}>
+                  {tipoSoftware}
+                </span>
+                {!item.leido && (
+                  <span class="bg-blue-500/10 text-blue-400 text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded animate-pulse">
+                    Nuevo
+                  </span>
+                )}
+              </div>
+              
+              <div class="flex items-center gap-4 text-xs text-slate-400 mt-1.5 flex-wrap">
+                <span class="flex items-center gap-1.5">
+                  <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                  </svg>
+                  {item.correo}
+                </span>
+                {item.telefono && item.telefono !== 'No especificado' && (
+                  <span class="flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                    </svg>
+                    {item.telefono}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <span class="text-xs text-slate-500 bg-slate-900/60 px-3 py-1 rounded-lg border border-slate-800/40 font-mono whitespace-nowrap">
+              {fechaFormateada}
+            </span>
+          </div>
+
+          <div class="bg-slate-900/50 rounded-xl p-4 border border-slate-800/40 text-sm text-slate-300 leading-relaxed mb-5">
+            <p class="text-slate-500 text-xs font-medium uppercase tracking-wider mb-1.5">Requerimiento de software:</p>
+            {mensajeLimpio}
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-slate-900">
+            <div class="flex items-center gap-2 flex-wrap">
+              <a 
+                href={`https://wa.me/${item.telefono?.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${item.nombre}, gracias por contactar a Acute. He revisado tu solicitud sobre el software (${tipoSoftware}) y...`)}`}
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500 px-4 py-2 text-xs font-semibold text-emerald-400 hover:text-white transition-all duration-300"
+              >
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                  <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.4 0 12.008 0c3.202.001 6.212 1.246 8.477 3.513 2.263 2.268 3.507 5.28 3.503 8.487-.008 6.652-5.34 12-11.958 12-2.005-.001-3.973-.503-5.729-1.457L0 24zm6.59-4.046c1.654.982 3.511 1.5 5.409 1.5 5.315 0 9.642-4.327 9.648-9.647.003-2.577-1-5.002-2.82-6.825C17.06 3.16 14.636 2.16 12.01 2.16c-5.322 0-9.65 4.327-9.656 9.648-.001 2.02.527 3.991 1.53 5.733L2.895 21.19l3.752-1.236zM17.93 15.3c-.322-.16-1.905-.94-2.197-1.047-.294-.108-.507-.16-.72.16-.214.32-.828 1.047-1.014 1.26-.187.214-.373.24-.696.08-.322-.16-1.36-.5-2.59-1.6c-.957-.852-1.602-1.905-1.79-2.225-.186-.32-.02-.493.14-.654.146-.144.323-.374.484-.56.16-.188.214-.32.32-.534.108-.214.054-.4-.026-.56-.08-.16-.72-1.734-.987-2.374-.26-.625-.526-.54-.72-.55-.187-.01-.4-.01-.614-.01-.214 0-.56.08-.854.4-.294.32-1.12 1.1-1.12 2.678 0 1.578 1.147 3.1 1.307 3.32.16.214 2.257 3.447 5.467 4.837.763.33 1.357.527 1.82.674.766.244 1.463.21 2.013.127.614-.093 1.905-.78 2.172-1.496.267-.713.267-1.325.187-1.453-.08-.126-.294-.213-.615-.373z"/>
+                </svg>
+                Responder por WhatsApp
+              </a>
+
+              <a 
+                href={`mailto:${item.correo}?subject=${encodeURIComponent(subjectMail)}&body=${encodeURIComponent(bodyMail)}`}
+                class="inline-flex items-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 px-4 py-2 text-xs font-semibold text-slate-300 hover:text-white transition-all duration-300 border border-slate-800"
+              >
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                </svg>
+                Responder por Correo
+              </a>
+
+              <form method="POST" class="inline m-0">
+                <input type="hidden" name="accion" value="crear_cliente" />
+                <input type="hidden" name="nombre_empresa" value={item.nombre || 'Prospecto Web'} />
+                <input type="hidden" name="nombre_contacto" value={item.nombre || 'Sin Nombre'} />
+                <input type="hidden" name="correo" value={item.correo || ''} />
+                <input type="hidden" name="telefono" value={item.telefono || ''} />
+                <button 
+                  type="submit"
+                  class="inline-flex items-center gap-2 rounded-xl bg-blue-500/10 hover:bg-blue-600 px-4 py-2 text-xs font-semibold text-blue-400 hover:text-white transition-all duration-300 border border-blue-500/20"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                  </svg>
+                  Convertir en Cliente
+                </button>
+              </form>
+            </div>
+
+            <div class="flex items-center gap-2">
+              {!item.leido && (
+                <button 
+                  type="button"
+                  data-action="read"
+                  data-id={itemId}
+                  class="inline-flex items-center gap-1.5 rounded-xl bg-blue-500/10 hover:bg-blue-600 px-3 py-2 text-xs font-medium text-blue-400 hover:text-white transition-all duration-300"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  Marcar leído
+                </button>
+              )}
+              
+              <button 
+                type="button"
+                data-action="delete"
+                data-id={itemId}
+                class="inline-flex items-center gap-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-600 px-3 py-2 text-xs font-medium text-rose-400 hover:text-white transition-all duration-300"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-16v4M4 7h16"/>
+                </svg>
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    })}
+
+    {listaMensajes.length === 0 && (
+      <div class="text-center py-16 bg-slate-900/20 rounded-2xl border border-slate-800/50">
+        <p class="text-slate-400 text-sm">El buzón está vacío de momento.</p>
+      </div>
+    )}
+  </div>
+</div>
+
+<script is:inline>
+  function setupBuzon() {
+    const buzonContainer = document.getElementById('buzon-container');
+    if (!buzonContainer) return;
+
+    buzonContainer.replaceWith(buzonContainer.cloneNode(true));
+    const activeContainer = document.getElementById('buzon-container');
+    if (!activeContainer) return;
+
+    activeContainer.addEventListener('click', async (e) => {
+      const target = e.target;
+      const button = target.closest('button');
+      
+      if (!button) return;
+      if (button.type === 'submit') return;
+
+      const id = button.getAttribute('data-id');
+      const action = button.getAttribute('data-action');
+      
+      // Corrección de Nodo: Buscamos explícitamente la tarjeta con la clase de cotización
+      const card = button.closest('.tarjeta-cotizacion');
+
+      if (!id || !card) return;
+
+      // ACCIÓN: MARCAR COMO LEÍDO
+      if (action === 'read') {
+        button.setAttribute('disabled', 'true');
+        const originalContent = button.innerHTML;
+        button.textContent = 'Actualizando...';
+
+        try {
+          const res = await fetch('/api/mensajes-contacto', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: String(id), leido: true })
+          });
+          
+          if (res.ok) {
+            window.location.reload();
+          } else {
+            const errData = await res.json().catch(() => ({}));
+            alert(`Error del servidor: ${errData.error || 'No se pudo actualizar'}`);
+            button.removeAttribute('disabled');
+            button.innerHTML = originalContent;
+          }
+        } catch (err) {
+          alert('Error de red al conectar con el servidor.');
+          button.removeAttribute('disabled');
+          button.innerHTML = originalContent;
+        }
+      }
+
+      // ACCIÓN: ELIMINAR MENSAJE
+      if (action === 'delete') {
+        if (!confirm('¿Eliminar este mensaje permanentemente?')) return;
+        
+        button.setAttribute('disabled', 'true');
+        const originalContent = button.innerHTML;
+        button.textContent = 'Eliminando...';
+
+        try {
+          const res = await fetch('/api/mensajes-contacto', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: String(id) })
+          });
+          
+          if (res.ok) {
+            // Remueve la tarjeta completa de la interfaz de forma limpia
+            card.remove();
+            if (activeContainer.getElementsByClassName('tarjeta-cotizacion').length === 0) {
+              window.location.reload();
+            }
+          } else {
+            const errData = await res.json().catch(() => ({}));
+            alert(`Error al eliminar: ${errData.error || 'No se pudo borrar el registro'}`);
+            button.removeAttribute('disabled');
+            button.innerHTML = originalContent;
+          }
+        } catch (err) {
+          alert('Error de red al intentar eliminar.');
+          button.removeAttribute('disabled');
+          button.innerHTML = originalContent;
+        }
+      }
+    });
+  }
+
+  setupBuzon();
+  document.addEventListener('astro:page-load', setupBuzon);
+</script>

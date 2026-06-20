@@ -1,14 +1,14 @@
 ---
-// src/pages/admin/index.astro
 export const prerender = false; // Forzamos SSR en cada visita para verificar la sesión
 
 import { supabase } from '../../lib/supabase';
 import Navbar from '../../components/admin/Navbar.astro';
+
 import Kpis from '../../components/admin/Kpis.astro';
 import TabClientes from '../../components/admin/TabClientes.astro';
 import TabProyectos from '../../components/admin/TabProyectos.astro';
+import TabMensajes from '../../components/admin/TabMensajes.astro';
 import TabCotizaciones from '../../components/admin/TabCotizaciones.astro';
-
 // -------------------------------------------------------------------------
 // 1. GUARDIÁN DE ACCESO: CONTROL DE USUARIOS AUTORIZADOS POR SUPABASE
 // -------------------------------------------------------------------------
@@ -38,11 +38,17 @@ if (errorAutorizacion || !usuarioAutorizado) {
 // -------------------------------------------------------------------------
 // 2. CONFIGURACIÓN INICIAL Y PARÁMETROS URL
 // -------------------------------------------------------------------------
-const tituloPanel = "CRM & Control Operativo | Acute";
-let mensajeFeedBack = "";
-
 const url = new URL(Astro.request.url);
 const seccionActiva = url.searchParams.get("tab") || "clientes";
+
+// 2. ACTUALIZACIÓN: Añadimos el título correspondiente para la sección de cotizaciones
+const tituloPanel = 
+  seccionActiva === "clientes" ? "Acute | Clientes" :
+  seccionActiva === "proyectos" ? "Acute | Finanzas" :
+  seccionActiva === "mensajes" ? "Acute | Mensajes" :
+  seccionActiva === "cotizaciones" ? "Acute | Cotizaciones" : 
+  "Acute | Dashboard";
+let mensajeFeedBack = "";
 
 // -------------------------------------------------------------------------
 // 3. PROCESAR ACCIONES DE FORMULARIOS (POST)
@@ -195,6 +201,11 @@ const cuentasPorCobrar = ingresosTotales - dineroEnMano;
       </div>
     )}
 
+    {seccionActiva === "mensajes" && (
+      <TabMensajes />
+    )}
+
+    {/* 3. ACTUALIZACIÓN: Renderizamos la nueva sección si está seleccionada en la URL */}
     {seccionActiva === "cotizaciones" && (
       <TabCotizaciones />
     )}

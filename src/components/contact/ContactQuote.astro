@@ -94,7 +94,7 @@
       status.textContent = 'Procesando tu solicitud de forma segura...';
       
       try {
-        const response = await fetch('/api/cotizaciones', {
+        const response = await fetch('/api/mensajes-contacto', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

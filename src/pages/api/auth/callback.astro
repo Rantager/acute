@@ -48,7 +48,7 @@ export const prerender = false;
             const emailReal = data.session.user.email.trim().toLowerCase();
             // Inyectamos la cookie de forma limpia con el email real de Google para el guardián de index.astro
             document.cookie = "acute_admin_session=" + encodeURIComponent(emailReal) + "; path=/; max-age=" + (60*60*24) + "; SameSite=Lax; Secure";
-            window.location.href = '/admin?tab=cotizaciones';
+            window.location.href = '/admin?tab=mensajes';
             return;
           }
         }
@@ -58,7 +58,7 @@ export const prerender = false;
         if (session?.user?.email) {
           const emailReal = session.user.email.trim().toLowerCase();
           document.cookie = "acute_admin_session=" + encodeURIComponent(emailReal) + "; path=/; max-age=" + (60*60*24) + "; SameSite=Lax; Secure";
-          window.location.href = '/admin?tab=cotizaciones';
+          window.location.href = '/admin?tab=mensajes';
         } else {
           console.warn("No se encontró código ni sesión activa.");
           window.location.href = '/admin/login?error=error_auth';

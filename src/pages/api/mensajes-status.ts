@@ -1,4 +1,4 @@
-// src/pages/api/cotizaciones-status.ts
+// src/pages/api/mensajes-status.ts
 export const prerender = false;
 
 import type { APIRoute } from 'astro';
@@ -16,7 +16,7 @@ export const PATCH: APIRoute = async ({ request }) => {
 
     // UPDATE en Supabase usando el ID como String (UUID)
     const { data, error } = await supabase
-      .from('cotizaciones')
+      .from('mensajes_contacto')
       .update({ leido: leido })
       .eq('id', String(id))
       .select();
@@ -42,7 +42,7 @@ export const DELETE: APIRoute = async ({ request }) => {
 
     // DELETE en Supabase usando el ID como String (UUID)
     const { error } = await supabase
-      .from('cotizaciones')
+      .from('mensajes_contacto')
       .delete()
       .eq('id', String(id));
 
