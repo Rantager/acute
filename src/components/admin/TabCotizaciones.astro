@@ -2,25 +2,30 @@
 import { supabase } from '../../lib/supabase';
 import ContenedorCotizaciones from './cotizaciones/ContenedorCotizaciones';
 
-// Traemos los mensajes/prospectos de la base de datos para tratarlos como clientes en esta sección
-const { data: dbMensajes, error } = await supabase
-  .from('mensajes_contacto')
-  .select('id, nombre, correo, telefono')
-  .order('nombre', { ascending: true });
+// Consultamos la tabla de clientes reales en lugar de los mensajes
+const { data: dbClientes, error } = await supabase
+  .from('clientes')
+  .select('id, nombre_contacto, correo, telefono')
+  .order('nombre_contacto', { ascending: true });
 
 if (error) {
   console.error('[TabCotizaciones SQL Error]:', error.message);
 }
 
-const clientesMapeados = dbMensajes || [];
+// Mapeamos 'nombre_contacto' al campo 'nombre' que espera el componente de React
+const clientesMapeados = (dbClientes || []).map(cliente => ({
+  id: cliente.id.toString(),
+  nombre: cliente.nombre_contacto || 'Sin nombre',
+  correo: cliente.correo,
+  telefono: cliente.telefono
+}));
 ---
 
 <div className="space-y-4 w-full">
   <div class="flex flex-col gap-1 mb-2">
     <h1 class="text-2xl font-bold tracking-tight text-white">Gestión de Cotizaciones</h1>
-    <p class="text-xs text-slate-400">Selecciona un prospecto para redactar propuestas formales de desarrollo de software o ver presupuestos emitidos.</p>
+    <p class="text-xs text-slate-400">Selecciona un cliente de tu base de datos para redactar propuestas formales de desarrollo de software o revisar su historial.</p>
   </div>
 
-  <!-- Cargamos el contenedor reactivo pasándole los datos iniciales desde el servidor -->
   <ContenedorCotizaciones clientesIniciales={clientesMapeados} client:load />
 </div>

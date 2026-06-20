@@ -32,11 +32,35 @@ async function generateNextFolio(): Promise<string> {
   return `${prefix}${String(nextSeq).padStart(4, '0')}`;
 }
 
+// GET: Consultar cotizaciones de un cliente (?cliente_id=...)
+export const GET: APIRoute = async ({ request }) => {
+  const url = new URL(request.url);
+  const clienteId = url.searchParams.get('cliente_id');
+
+  if (!clienteId) {
+    return new Response(JSON.stringify({ error: 'Falta el parámetro cliente_id.' }), { status: 400 });
+  }
+
+  const { data, error } = await supabase
+    .from('cotizaciones_proyectos')
+    .select('*')
+    .eq('cliente_id', clienteId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('[GET Cotizaciones Error]:', error.message);
+    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+  }
+
+  return new Response(JSON.stringify({ success: true, data }), { status: 200 });
+};
+
+// POST: Crear una nueva cotización amarrada al cliente
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
     const {
-      mensaje_id,
+      cliente_id,
       titulo_proyecto,
       descripcion_proyecto,
       alcances,
@@ -48,7 +72,7 @@ export const POST: APIRoute = async ({ request }) => {
       estado
     } = body;
 
-    if (!mensaje_id || !titulo_proyecto || inversion_total === undefined) {
+    if (!cliente_id || !titulo_proyecto || inversion_total === undefined) {
       return new Response(JSON.stringify({ error: 'Faltan campos requeridos.' }), { status: 400 });
     }
 
@@ -57,13 +81,13 @@ export const POST: APIRoute = async ({ request }) => {
     const { data, error } = await supabase
       .from('cotizaciones_proyectos')
       .insert([{
-        mensaje_id,
+        cliente_id,
         folio,
         titulo_proyecto,
         descripcion_proyecto,
         alcances: alcances || [],
         exclusiones: exclusiones || [],
-        tiempos_desarrollo: tiempos_desarrollo || [],
+        tiempos_desarrollo: tiempos_desarrollo || '',
         inversion_total,
         forma_pago,
         vigencia,
@@ -84,6 +108,7 @@ export const POST: APIRoute = async ({ request }) => {
   }
 };
 
+// PUT: Editar cambios de la cotización
 export const PUT: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
@@ -111,7 +136,7 @@ export const PUT: APIRoute = async ({ request }) => {
         descripcion_proyecto,
         alcances: alcances || [],
         exclusiones: exclusiones || [],
-        tiempos_desarrollo: tiempos_desarrollo || [],
+        tiempos_desarrollo: tiempos_desarrollo || '',
         inversion_total,
         forma_pago,
         vigencia,
@@ -131,4 +156,26 @@ export const PUT: APIRoute = async ({ request }) => {
     console.error('[API Cotizaciones PUT Error]:', error);
     return new Response(JSON.stringify({ error: 'Error interno del servidor' }), { status: 500 });
   }
+};
+
+// DELETE: Eliminar cotización de la base de datos (?id=...)
+export const DELETE: APIRoute = async ({ request }) => {
+  const url = new URL(request.url);
+  const id = url.searchParams.get('id');
+
+  if (!id) {
+    return new Response(JSON.stringify({ error: 'Falta el parámetro id.' }), { status: 400 });
+  }
+
+  const { error } = await supabase
+    .from('cotizaciones_proyectos')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('[DELETE Cotizacion Error]:', error.message);
+    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+  }
+
+  return new Response(JSON.stringify({ success: true }), { status: 200 });
 };

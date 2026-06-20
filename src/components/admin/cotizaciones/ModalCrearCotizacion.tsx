@@ -80,7 +80,7 @@ export default function ModalCrearCotizacion({
 
     const payload = {
       id: cotizacionAEditar?.id,
-      mensaje_id: cliente.id,
+      cliente_id: cliente.id,
       titulo_proyecto: titulo,
       descripcion_proyecto: descripcion,
       alcances: cleanAlcances,
