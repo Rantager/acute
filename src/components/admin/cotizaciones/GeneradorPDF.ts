@@ -4,7 +4,7 @@ interface Cliente {
   nombre: string;
   correo: string;
   telefono?: string;
-  nombre_empresa?: string; // Por si cuentas con la propiedad en el objeto cliente
+  nombre_empresa?: string;
 }
 
 interface Cotizacion {
@@ -16,6 +16,7 @@ interface Cotizacion {
   inversion_total: number;
   forma_pago?: string;
   vigencia?: string;
+  notas_adicionales?: string;
   created_at: string;
 }
 
@@ -27,23 +28,45 @@ export function generarCotizacionPDF(cliente: Cliente, cot: Cotizacion) {
   });
 
   // --- CONFIGURACIÓN ESTRUCTURAL ---
-  const margin = 25; // Márgenes amplios (25mm)
-  const pageWidth = 215.9; // Carta: 8.5 x 11 pulgadas
+  const margin = 25; 
+  const pageWidth = 215.9; 
   const pageHeight = 279.4;
-  const maxWidth = pageWidth - (margin * 2); // 165.9mm de área de impresión
+  const maxWidth = pageWidth - (margin * 2); 
   let y = margin;
 
   // --- PALETA MONOCROMÁTICA ---
-  const COLOR_TEXT_PRIMARY = [15, 23, 42];   // #0f172a - Negro Corporativo
-  const COLOR_TEXT_MUTED = [100, 116, 139];  // #64748b - Gris Intermedio
-  const COLOR_LINE = [226, 232, 240];        // #e2e8f0 - Gris Claro para separadores
+  const COLOR_TEXT_PRIMARY = [15, 23, 42];   
+  const COLOR_TEXT_MUTED = [100, 116, 139];  
+  const COLOR_LINE = [226, 232, 240];        
 
   // --- FUNCIONES UTILITARIAS INTERNAS ---
+  const drawFooter = () => {
+    const currentFontSize = doc.getFontSize();
+    const currentTextColor = doc.getTextColor();
+    // @ts-ignore
+    const currentFont = doc.getFont();
+
+    const originalPage = doc.getNumberOfPages();
+    doc.setPage(originalPage);
+
+    doc.setFont('Helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(COLOR_TEXT_MUTED[0], COLOR_TEXT_MUTED[1], COLOR_TEXT_MUTED[2]);
+
+    const footerText = `Gracias por la confianza.  |  Acute  |  acutewebdesign7@gmail.com |  acute.mx`;
+    doc.text(footerText, pageWidth / 2, pageHeight - 12, { align: 'center' });
+
+    if (currentFont) doc.setFont(currentFont.fontName, currentFont.fontStyle);
+    doc.setFontSize(currentFontSize);
+    // @ts-ignore
+    if (currentTextColor) doc.setTextColor(currentTextColor);
+  };
+
   const checkPageOverflow = (neededHeight: number) => {
     if (y + neededHeight > pageHeight - margin - 15) {
       doc.addPage();
       y = margin;
-      drawFooter(); // Dibuja el pie en cada página nueva
+      drawFooter(); 
     }
   };
 
@@ -63,20 +86,8 @@ export function generarCotizacionPDF(cliente: Cliente, cot: Cotizacion) {
     y += 6;
   };
 
-  const drawFooter = () => {
-    const originalPage = doc.getNumberOfPages();
-    doc.setPage(originalPage);
-
-    doc.setFont('Helvetica', 'normal');
-    doc.setFontSize(8);
-    doc.setTextColor(COLOR_TEXT_MUTED[0], COLOR_TEXT_MUTED[1], COLOR_TEXT_MUTED[2]);
-
-    const footerText = `Gracias por la confianza.  |  Acute  |  acutewebdesign7@gmail.com |  acute.mx`;
-    doc.text(footerText, pageWidth / 2, pageHeight - 12, { align: 'center' });
-  };
-
   // --- INICIO DEL DOCUMENTO ---
-  drawFooter(); // Inicializa el footer en la página 1
+  drawFooter();
 
   // --- ENCABEZADO ---
   // 1. Pega aquí el código Base64 completo de tu logotipo
@@ -84,15 +95,17 @@ export function generarCotizacionPDF(cliente: Cliente, cot: Cotizacion) {
 
   // 2. Inyección del Logotipo Corporativo en el documento
   try {
-    // Parámetros: imagen (Base64), formato, coordenada X, coordenada Y, ancho (mm), alto (mm)
-    // El ancho está fijado en 32mm. El alto de 10mm puedes ajustarlo proporcionalmente a tu logo.
-    doc.addImage(LOGO_ACUTE_BASE64, 'PNG', margin, y, 32, 10);
-    y += 14;
+    if (LOGO_ACUTE_BASE64) {
+      doc.addImage(LOGO_ACUTE_BASE64, 'PNG', margin, y, 32, 10);
+      y += 14;
+    } else {
+      y += 10; 
+    }
   } catch (e) {
     console.error("No se pudo cargar el logotipo en el PDF:", e);
     y += 10;
   }
-  // Información del Emisor
+
   doc.setFont('Helvetica', 'normal');
   doc.setFontSize(9);
   doc.setTextColor(COLOR_TEXT_MUTED[0], COLOR_TEXT_MUTED[1], COLOR_TEXT_MUTED[2]);
@@ -101,7 +114,6 @@ export function generarCotizacionPDF(cliente: Cliente, cot: Cotizacion) {
   doc.text('Colima, México', margin, y + 9);
   doc.text('acute.mx', margin, y + 13.5);
 
-  // Lado Derecho: Metadatos de la Propuesta (Alineados a la derecha de forma estricta)
   const rightColumnX = margin + maxWidth;
 
   doc.setFont('Helvetica', 'bold');
@@ -115,7 +127,7 @@ export function generarCotizacionPDF(cliente: Cliente, cot: Cotizacion) {
   doc.text(`Folio: ${cot.folio}`, rightColumnX, margin + 10, { align: 'right' });
 
   doc.setTextColor(COLOR_TEXT_MUTED[0], COLOR_TEXT_MUTED[1], COLOR_TEXT_MUTED[2]);
-  const fechaEmision = new Date(cot.created_at || new Date()).toLocaleDateString('es-MX', {
+  const fechaEmision = new Date(new Date()).toLocaleDateString('es-MX', {
     year: 'numeric', month: 'long', day: 'numeric'
   });
   doc.text(`Emisión: ${fechaEmision}`, rightColumnX, margin + 15, { align: 'right' });
@@ -167,7 +179,7 @@ export function generarCotizacionPDF(cliente: Cliente, cot: Cotizacion) {
 
     const descLines = doc.splitTextToSize(cot.descripcion_proyecto, maxWidth);
     checkPageOverflow(descLines.length * 5);
-    doc.text(descLines, margin, y, { align: 'justify' });
+    doc.text(descLines, margin, y);
     y += (descLines.length * 5) + 6;
   }
   drawSeparator();
@@ -185,10 +197,9 @@ export function generarCotizacionPDF(cliente: Cliente, cot: Cotizacion) {
       const alcanceLines = doc.splitTextToSize(alcance, maxWidth - 6);
       checkPageOverflow((alcanceLines.length * 5) + 3);
 
-      // Viñeta simple: Guión medio clásico y formal
       doc.text('-', margin + 1, y);
       doc.text(alcanceLines, margin + 6, y);
-      y += (alcanceLines.length * 5) + 3; // Espaciado controlado entre elementos
+      y += (alcanceLines.length * 5) + 3; 
     });
 
     y += 4;
@@ -217,7 +228,6 @@ export function generarCotizacionPDF(cliente: Cliente, cot: Cotizacion) {
   doc.setFontSize(10);
   doc.text('Inversión Total:', margin, y);
 
-  // Destacado formal mediante jerarquía de fuentes (Negrita y tamaño grande sin color)
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(14);
   const totalFormat = `$${Number(cot.inversion_total).toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN`;
@@ -234,6 +244,23 @@ export function generarCotizacionPDF(cliente: Cliente, cot: Cotizacion) {
 
   y += 6;
   drawSeparator();
+
+  // --- NUEVA SECCIÓN: CONSIDERACIONES ADICIONALES (Hosting / Planes) ---
+  if (cot.notas_adicionales) {
+    checkPageOverflow(30);
+    drawSectionTitle('CONSIDERACIONES ADICIONALES');
+
+    doc.setFont('Helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(COLOR_TEXT_PRIMARY[0], COLOR_TEXT_PRIMARY[1], COLOR_TEXT_PRIMARY[2]);
+
+    const notasLines = doc.splitTextToSize(cot.notas_adicionales, maxWidth);
+    checkPageOverflow(notasLines.length * 5);
+    doc.text(notasLines, margin, y);
+    y += (notasLines.length * 5) + 6;
+    
+    drawSeparator();
+  }
 
   // --- OBSERVACIONES CLAUSULARES ---
   checkPageOverflow(40);
@@ -262,7 +289,7 @@ export function generarCotizacionPDF(cliente: Cliente, cot: Cotizacion) {
 
   // --- FIRMA DE CONFORMIDAD ---
   checkPageOverflow(45);
-  y += 20; // Espacio en blanco amplio para la firma manuscrita
+  y += 20; 
 
   const lineLength = 70;
   const lineX = (pageWidth - lineLength) / 2;

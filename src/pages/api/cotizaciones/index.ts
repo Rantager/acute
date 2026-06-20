@@ -66,6 +66,7 @@ export const POST: APIRoute = async ({ request }) => {
       alcances,
       exclusiones,
       tiempos_desarrollo,
+      notas_adicionales, // <-- NUEVA VARIABLE EXTRAÍDA
       inversion_total,
       forma_pago,
       vigencia,
@@ -88,6 +89,7 @@ export const POST: APIRoute = async ({ request }) => {
         alcances: alcances || [],
         exclusiones: exclusiones || [],
         tiempos_desarrollo: tiempos_desarrollo || '',
+        notas_adicionales: notas_adicionales || '', // <-- INYECTADA A LA BD
         inversion_total,
         forma_pago,
         vigencia,
@@ -119,6 +121,7 @@ export const PUT: APIRoute = async ({ request }) => {
       alcances,
       exclusiones,
       tiempos_desarrollo,
+      notas_adicionales, // <-- NUEVA VARIABLE EXTRAÍDA
       inversion_total,
       forma_pago,
       vigencia,
@@ -137,6 +140,7 @@ export const PUT: APIRoute = async ({ request }) => {
         alcances: alcances || [],
         exclusiones: exclusiones || [],
         tiempos_desarrollo: tiempos_desarrollo || '',
+        notas_adicionales: notas_adicionales || '', // <-- ACTUALIZADA EN LA BD
         inversion_total,
         forma_pago,
         vigencia,

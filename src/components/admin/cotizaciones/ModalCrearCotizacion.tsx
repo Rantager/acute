@@ -26,6 +26,7 @@ export default function ModalCrearCotizacion({
   const [descripcion, setDescripcion] = useState('');
   const [alcances, setAlcances] = useState<string[]>(['']);
   const [tiempoDesarrollo, setTiempoDesarrollo] = useState('');
+  const [notasAdicionales, setNotasAdicionales] = useState(''); // <-- NUEVO ESTADO
   const [inversion, setInversion] = useState('');
   const [formaPago, setFormaPago] = useState('50% anticipo, 50% al entregar');
   const [vigencia, setVigencia] = useState('15 días naturales');
@@ -39,6 +40,7 @@ export default function ModalCrearCotizacion({
       setDescripcion(cotizacionAEditar.descripcion_proyecto || '');
       setAlcances(cotizacionAEditar.alcances && cotizacionAEditar.alcances.length > 0 ? cotizacionAEditar.alcances : ['']);
       setTiempoDesarrollo(cotizacionAEditar.tiempos_desarrollo || '');
+      setNotasAdicionales(cotizacionAEditar.notas_adicionales || ''); // <-- CARGAR AL EDITAR
       setInversion(cotizacionAEditar.inversion_total || '');
       setFormaPago(cotizacionAEditar.forma_pago || '');
       setVigencia(cotizacionAEditar.vigencia || '');
@@ -48,6 +50,7 @@ export default function ModalCrearCotizacion({
       setDescripcion('');
       setAlcances(['']);
       setTiempoDesarrollo('');
+      setNotasAdicionales(''); // <-- LIMPIAR AL CREAR NUEVA
       setInversion('');
       setFormaPago('50% anticipo, 50% al entregar');
       setVigencia('15 días naturales');
@@ -86,6 +89,7 @@ export default function ModalCrearCotizacion({
       alcances: cleanAlcances,
       exclusiones: [],
       tiempos_desarrollo: tiempoDesarrollo,
+      notas_adicionales: notasAdicionales, // <-- ENVIAR EN EL PAYLOAD
       inversion_total: parseFloat(inversion),
       forma_pago: formaPago,
       vigencia,
@@ -216,6 +220,19 @@ export default function ModalCrearCotizacion({
               Tiempo de Desarrollo Estimado
             </label>
             <input type="text" value={tiempoDesarrollo} onChange={e => setTiempoDesarrollo(e.target.value)} className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors" placeholder="Ej: 4 a 6 semanas" />
+          </div>
+
+          <hr className="border-slate-800" />
+
+          {/* Consideraciones Adicionales (Hosting, pagos mensuales, etc.) */}
+          <div>
+            <label className="flex items-center gap-2 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+              <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Consideraciones Adicionales (Hosting, Mantenimiento, etc.)
+            </label>
+            <textarea value={notasAdicionales} onChange={e => setNotasAdicionales(e.target.value)} rows={3} className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors" placeholder="Ej: El cliente opta por el plan de hosting de $500 MXN mensuales que incluye actualizaciones de base de datos..." />
           </div>
 
           <hr className="border-slate-800" />
