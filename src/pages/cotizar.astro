@@ -2,12 +2,27 @@
 import Layout from '../layouts/Layout.astro';
 import ContactQuote from '../components/contact/ContactQuote.astro';
 ---
+
 <Layout
-  title="Contacto"
-  description="Solicita una cotización para tu proyecto de software a medida."
-  image="https://www.acute.dev/og-image.png"
+  title="Contacto y Cotizaciones | Agencia de Software en Colima y Tecomán"
+  description="Contacta a Acute. Solicita la cotización de tu proyecto de desarrollo web, aplicaciones móviles o sistemas empresariales a la medida desde Colima y Tecomán."
+  image="https://www.acute.mx/img/acute-logo.png"
 >
-  <main class="space-y-16">
+  <main class="space-y-16 py-12">
+    <!-- Bloque Restaurado al Formato Elegante (Alineado a la izquierda) -->
+    <section class="max-w-4xl px-4 sm:px-6">
+      <p class="text-sm uppercase tracking-[0.3em] text-blue-500 font-semibold">Contacto</p>
+      
+      <h1 class="mt-3 text-4xl font-bold text-white tracking-tight sm:text-5xl">
+        Hablemos de tu próximo proyecto.
+      </h1>
+      
+      <p class="mt-4 text-slate-400 leading-relaxed text-lg max-w-3xl">
+        En <strong class="text-slate-200">Acute</strong> transformamos tus ideas en código. Ya sea que busques desarrollo web, una app móvil o un sistema a la medida, operamos desde <strong class="text-slate-200">Colima y Tecomán</strong> para construir software de alto rendimiento.
+      </p>
+    </section>
+
+    <!-- Tu formulario de cotización -->
     <ContactQuote />
   </main>
 </Layout>

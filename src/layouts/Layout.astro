@@ -1,9 +1,18 @@
 ---
 const { title, description, image } = Astro.props;
-const siteUrl = 'https://www.acute.dev';
-const pageTitle = title ? `Acute | ${title}` : 'Acute | Desarrollo';
-const pageDescription = description ?? 'Acute diseña aplicaciones web y sistemas escalables con enfoque en rendimiento, calidad y experiencia de usuario.';
-const pageImage = image ?? `${siteUrl}/og-image.png`;
+const siteUrl = 'https://www.acute.mx';
+
+// 1. Dinamismo para la URL exacta y evitar contenido duplicado
+const canonicalUrl = new URL(Astro.url.pathname, siteUrl);
+
+// 2. Mejoramos el título por defecto agregando tus palabras clave locales
+const pageTitle = title ? `Acute | ${title}` : 'Acute | Desarrollo Web y Sistemas en Colima y Tecomán';
+
+// 3. Mejoramos la descripción por defecto orientada a SEO local
+const pageDescription = description ?? 'Agencia de software en Colima. Diseñamos y desarrollamos aplicaciones web, páginas interactivas y sistemas escalables en Colima y Tecomán.';
+
+// 4. CORREGIDO: Agregamos /img/ para que coincida con tu estructura de archivos reales
+const pageImage = image ?? `${siteUrl}/img/acute-logo.png`; 
 import '../styles/global.css';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
@@ -17,19 +26,28 @@ import Footer from '../components/Footer.astro';
     <meta name="description" content={pageDescription} />
     <meta name="robots" content="index, follow" />
 
+    <!-- Enlace Canónico esencial para SEO -->
+    <link rel="canonical" href={canonicalUrl} />
+
     <title>{pageTitle}</title>
-    <link rel="icon" type="image/svg+xml" href="/img/icon.svg" />
+
+    <!-- CORREGIDO: Cambiado type a image/png y añadida la ruta /img/ para que Google encuentre tu logo -->
+    <link rel="icon" type="image/png" href="/img/acute-logo.png" />
+    
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
 
-    <meta property="og:locale" content="es_ES" />
+    <!-- Open Graph / Redes Sociales (Cambiado a es_MX) -->
+    <meta property="og:locale" content="es_MX" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={pageDescription} />
     <meta property="og:image" content={pageImage} />
-    <meta property="og:url" content={siteUrl} />
+    <meta property="og:url" content={canonicalUrl} />
     <meta property="og:site_name" content="Acute" />
+
+    <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={pageDescription} />
@@ -48,7 +66,7 @@ import Footer from '../components/Footer.astro';
       companyName="Acute"
       companyDescription="Transformamos ideas en soluciones de software escalables y de alta calidad."
       email="acutewebdesign7@gmail.com"
-      phone="+51 (313) 106 8471"
+      phone="+52 (313) 106 8471"
       location="Colima, México"
     />
   </body>

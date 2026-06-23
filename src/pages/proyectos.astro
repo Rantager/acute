@@ -2,12 +2,15 @@
 import Layout from '../layouts/Layout.astro';
 import Portfolio from '../components/home/Portfolio.astro';
 ---
+
 <Layout
-  title="Proyectos"
-  description="Casos de éxito: plataformas escalables, CRMs inteligentes y portales empresariales."
-  image="https://www.acute.dev/og-image.png"
+  title="Portafolio de Proyectos y Casos de Éxito | Acute"
+  description="Explora los sistemas a la medida, plataformas web escalables y CRMs empresariales desarrollados por Acute para negocios en Colima y Tecomán."
+  image="https://www.acute.mx/img/acute-logo.png"
 >
-  <main class="space-y-16">
+  <!-- Eliminamos space-y-16 y py-12 para pegar el contenido hacia arriba -->
+  <main>
+    <!-- Tu componente existente ahora iniciará mucho más arriba, corrigiendo el detalle de la imagen image_b8632b.png -->
     <Portfolio />
   </main>
 </Layout>
