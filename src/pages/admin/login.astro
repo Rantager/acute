@@ -30,7 +30,7 @@ if (url.searchParams.get("error") === "no_autorizado") {
       
       <div class="flex items-center gap-3 relative z-10">
         <img src="/img/logo.svg" alt="Acute Logo" class="h-[120px] w-[120px] object-contain" />
-        <span class="text-xl font-bold tracking-tight text-white font-mono">
+        <span class="text-xl font-bold tracking-tight text-white font-mono"></span>
       </div>
 
       <div class="max-w-md my-auto relative z-10 space-y-6">
@@ -39,7 +39,7 @@ if (url.searchParams.get("error") === "no_autorizado") {
           <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-indigo-400">Administración Acute.</span>
         </h1>
         <p class="text-base text-slate-400 leading-relaxed">
-          Portal interno para la gestión, auditoría y control operativo de la agencia. Al autenticarte obtendrás acceso directo al CRM para monitorear el estatus de los desarrollos, administrar saldos de clientes y responder mensajes del buzón.
+          Portal interno para la gestión, auditoría y control operativo de la agencia. Al autenticarte uobtendrás acceso directo al CRM para monitorear el estatus de los desarrollos, administrar saldos de clientes y responder mensajes del buzón.
         </p>
         
         <div class="pt-4 space-y-3">
@@ -130,7 +130,7 @@ if (url.searchParams.get("error") === "no_autorizado") {
             options: {
               redirectTo: targetRedirect,
               flowType: 'pkce'
-            }
+            } as any
           });
 
           if (error) throw error;

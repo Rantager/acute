@@ -1,6 +1,21 @@
 ---
 // src/components/admin/TabClientes.astro
-const { listaClientes } = Astro.props;
+
+// 1. Definimos la estructura exacta que tiene un cliente en tu base de datos
+interface Cliente {
+  id: number | string;
+  nombre_empresa: string;
+  nombre_contacto: string;
+  correo?: string | null;
+  telefono?: string | null;
+}
+
+// 2. Definimos las Props indicando que listaClientes es un arreglo de Clientes
+interface Props {
+  listaClientes: Cliente[];
+}
+
+const { listaClientes = [] } = Astro.props as Props;
 ---
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
   <section class="bg-slate-900/40 border border-slate-800 p-6 rounded-2xl shadow-xl">

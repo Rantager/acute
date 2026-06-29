@@ -2,6 +2,7 @@
 export const prerender = false; // Ejecución 100% en el servidor para leer datos reales
 
 import { supabase } from '../../lib/supabase';
+import AdminLayout from '../../layouts/AdminLayout.astro';
 
 // 1. Traer los mensajes de Supabase (Más reciente primero)
 const { data: mensajes, error } = await supabase

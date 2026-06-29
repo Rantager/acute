@@ -1,6 +1,37 @@
 ---
 // src/components/admin/TabProyectos.astro
-const { proyectosConCalculo, listaClientes = [] } = Astro.props;
+
+// 1. Declaramos la estructura de los clientes para el select
+interface Cliente {
+  id: string | number;
+  nombre_empresa: string;
+}
+
+// 2. Declaramos la estructura exacta que tu base de datos y cálculos le dan a cada proyecto
+interface Proyecto {
+  id: string | number;
+  nombre_app: string;
+  nombreEmpresa: string;
+  contactoNombre: string;
+  contactoCorreo: string;
+  contactoTelefono: string;
+  descripcion?: string | null;
+  tecnologias?: string | null;
+  total: number;
+  abonado: number;
+  saldo: number;
+  estatus: "En Desarrollo" | "En Pruebas" | "Terminado" | string;
+  fecha_inicio: string;
+  fecha_entrega_estimada?: string | null;
+  esLiquidado: boolean;
+}
+
+interface Props {
+  proyectosConCalculo: Proyecto[];
+  listaClientes: Cliente[];
+}
+
+const { proyectosConCalculo = [], listaClientes = [] } = Astro.props as Props;
 ---
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
   <section class="bg-slate-900/40 border border-slate-800 p-6 rounded-2xl shadow-xl lg:col-span-1">

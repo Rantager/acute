@@ -1,5 +1,13 @@
 ---
-const { href = '#', label, variant = 'primary' } = Astro.props;
+// Le decimos a TypeScript que variant SOLO puede ser 'primary' o 'secondary'
+interface Props {
+  href?: string;
+  label: string;
+  variant?: 'primary' | 'secondary';
+}
+
+const { href = '#', label, variant = 'primary' } = Astro.props as Props;
+
 const variants = {
   primary: 'inline-flex items-center justify-center rounded-full bg-brand-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500/60',
   secondary: 'inline-flex items-center justify-center rounded-full border border-slate-700 bg-slate-900 px-6 py-3 text-sm font-semibold text-slate-100 transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500/40'
