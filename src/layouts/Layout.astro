@@ -1,21 +1,44 @@
 ---
-const { title, description, image } = Astro.props;
-const siteUrl = 'https://www.acute.mx';
-
-// 1. Dinamismo para la URL exacta y evitar contenido duplicado
-const canonicalUrl = new URL(Astro.url.pathname, siteUrl);
-
-// 2. Mejoramos el título por defecto agregando tus palabras clave locales
-const pageTitle = title ? `Acute | ${title}` : 'Acute | Desarrollo Web y Sistemas en Colima y Tecomán';
-
-// 3. Mejoramos la descripción por defecto orientada a SEO local
-const pageDescription = description ?? 'Agencia de software en Colima. Diseñamos y desarrollamos aplicaciones web, páginas interactivas y sistemas escalables en Colima y Tecomán.';
-
-// 4. CORREGIDO: Agregamos /img/ para que coincida con tu estructura de archivos reales
-const pageImage = image ?? `${siteUrl}/img/acute-logo.png`; 
 import '../styles/global.css';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
+
+const { title, description, image } = Astro.props;
+const siteUrl = 'https://www.acute.mx';
+
+const canonicalUrl = new URL(Astro.url.pathname, siteUrl);
+const pageTitle = title ? `Acute | ${title}` : 'Acute | Desarrollo Web y Sistemas en Colima y Tecomán';
+const pageDescription = description ?? 'Agencia de software en Colima. Diseñamos y desarrollamos aplicaciones web, páginas interactivas y sistemas escalables en Colima y Tecomán.';
+const pageImage = image ?? `${siteUrl}/img/acute-logo.png`;
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': ['LocalBusiness', 'ProfessionalService'],
+  '@id': `${siteUrl}/#localbusiness`,
+  name: 'Acute',
+  url: siteUrl,
+  image: `${siteUrl}/img/acute-logo.png`,
+  description: 'Agencia de desarrollo de software y páginas web en Colima y Tecomán, México.',
+  email: 'acutewebdesign7@gmail.com',
+  telephone: '+52 313 106 8471',
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Colima',
+    addressRegion: 'Colima',
+    addressCountry: 'MX'
+  },
+  areaServed: [
+    { '@type': 'City', name: 'Colima' },
+    { '@type': 'City', name: 'Tecomán' }
+  ],
+  makesOffer: {
+    '@type': 'Offer',
+    itemOffered: {
+      '@type': 'Service',
+      name: 'Desarrollo de software y páginas web'
+    }
+  }
+};
 ---
 <!DOCTYPE html>
 <html lang="es">
@@ -34,7 +57,7 @@ import Footer from '../components/Footer.astro';
     <!-- CORREGIDO: Cambiado type a image/png y añadida la ruta /img/ para que Google encuentre tu logo -->
     <link rel="icon" type="image/png" href="/img/acute-logo.png" />
     
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
 
@@ -44,8 +67,11 @@ import Footer from '../components/Footer.astro';
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={pageDescription} />
     <meta property="og:image" content={pageImage} />
+    <meta property="og:image:alt" content="Acute, agencia de desarrollo de software" />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:site_name" content="Acute" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(localBusinessSchema)}></script>
 
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image" />

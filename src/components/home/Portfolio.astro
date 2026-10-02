@@ -32,8 +32,8 @@ const projects = [
     projectUrl: '',
   },
   {
-    id: 'remote',
-    title: 'Remote',
+    id: 'recless',
+    title: 'Recless',
     category: 'Automatizacion de Video',
     description: 'Automatizador en la nube para la creacion y renderizado rapido de contenido en video.',
     features: [
@@ -44,9 +44,24 @@ const projects = [
     ],
     techStack: ['React', 'Node.js', 'FFMPEG', 'AWS S3', 'OpenAI API'],
     imageUrl: '/img/remoteLogo.jpg',
-    projectUrl: '',
+    projectUrl: 'https://recless.net/',
   },
 ];
+
+const portfolioSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Portafolio de proyectos de Acute',
+  description: 'Casos de éxito de sistemas web, automatización y soluciones digitales desarrolladas por Acute en Colima y Tecomán.',
+  hasPart: projects.map((project) => ({
+    '@type': 'CreativeWork',
+    name: project.title,
+    description: project.description,
+    url: project.projectUrl || 'https://www.acute.mx/proyectos',
+    about: project.category,
+    keywords: project.techStack.join(', ')
+  }))
+};
 ---
 
 <section class="mt-16">
@@ -170,6 +185,8 @@ const projects = [
     })}
   </div>
 </section>
+
+<script type="application/ld+json" set:html={JSON.stringify(portfolioSchema)}></script>
 
 <script>
   const cards = document.querySelectorAll('.flip-card');

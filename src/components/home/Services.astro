@@ -37,6 +37,20 @@ const services = [
     tags: ['Code Review', 'Query Optimization', 'Security Logs', 'BI Dashboards']
   }
 ];
+
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: 'Servicios de desarrollo de software y páginas web de Acute',
+  provider: {
+    '@type': 'LocalBusiness',
+    name: 'Acute',
+    areaServed: ['Colima', 'Tecomán']
+  },
+  serviceType: services.map((service) => service.title),
+  description: 'Agencia de software en Colima y Tecomán que ofrece desarrollo web, aplicaciones móviles, sistemas empresariales y consultoría tecnológica.',
+  areaServed: ['Colima', 'Tecomán']
+};
 ---
 
 <section id="servicios" class="scroll-mt-20">
@@ -77,6 +91,8 @@ const services = [
     ))}
   </div>
 </section>
+
+<script type="application/ld+json" set:html={JSON.stringify(serviceSchema)}></script>
 
 <!-- SECCIÓN DE AUDITORÍA TÉCNICA -->
 <section class="mt-24 rounded-[2rem] border border-slate-800/40 bg-slate-950/40 p-8 lg:p-12 flex flex-col md:flex-row items-center justify-between gap-8">

@@ -43,14 +43,27 @@ const PREGUNTAS_BLOG = [
 
   
 ];
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: PREGUNTAS_BLOG.map((item) => ({
+    '@type': 'Question',
+    name: item.pregunta,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.descripcion
+    }
+  }))
+};
 ---
 
 <Layout
   title="Desarrollo Web y Sistemas a la Medida en Colima y Tecomán | Acute"
   description="Agencia de software en Colima. Desarrollamos aplicaciones web, sistemas empresariales y apps móviles en Colima y Tecomán con alto rendimiento y entrega ágil."
-  image="https://www.acute.mx/acute-logo.png" 
+  image="https://www.acute.mx/img/acute-logo.png"
 >
-  <main class="space-y-24">
+  <div class="space-y-24">
     <Hero />
 
     <!-- SECCIÓN: QUÉ CONSTRUIMOS -->
@@ -167,5 +180,7 @@ const PREGUNTAS_BLOG = [
         ))}
       </div>
     </section>
-  </main>
+  </div>
+
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
 </Layout>

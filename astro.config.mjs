@@ -15,18 +15,19 @@
 import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
 import vercel from '@astrojs/vercel/serverless';
-
 import react from '@astrojs/react';
+import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [tailwind(), react()],
+  site: 'https://www.acute.mx',
+  integrations: [tailwind(), react(), sitemap()],
   output: 'hybrid', // Mantiene tu web comercial estática
   adapter: vercel({
     // Forzamos quirúrgicamente a que las Serverless Functions se compilen para Node 20
     runtime: 'nodejs20.x'
   }),
-  
+
   vite: {
     build: {
       rollupOptions: {
