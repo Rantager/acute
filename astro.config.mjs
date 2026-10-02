@@ -23,10 +23,7 @@ export default defineConfig({
   site: 'https://www.acute.mx',
   integrations: [tailwind(), react(), sitemap()],
   output: 'hybrid', // Mantiene tu web comercial estática
-  adapter: vercel({
-    // Forzamos quirúrgicamente a que las Serverless Functions se compilen para Node 20
-    runtime: 'nodejs20.x'
-  }),
+  adapter: vercel(),
 
   vite: {
     build: {
